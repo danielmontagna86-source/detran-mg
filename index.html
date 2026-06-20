@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DETRAN MG">
+<meta name="theme-color" content="#0a0e1a">
+<title>Prova DETRAN MG — Estudo Completo</title>
+<style>
+  :root{
+    --bg:#0a0e1a;
+    --bg-card:#131829;
+    --bg-card-2:#1a2138;
+    --border:#252d44;
+    --txt:#e8ecf5;
+    --txt-dim:#8a93ab;
+    --accent:#00ffa3;
+    --accent-2:#00d4ff;
+    --warn:#ffb547;
+    --err:#ff4d6d;
+    --ok:#00ffa3;
+    --shadow: 0 4px 20px rgba(0,0,0,.4);
+    --radius:14px;
+    --safe-top: env(safe-area-inset-top, 0);
+    --safe-bot: env(safe-area-inset-bottom, 0);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55;overscroll-behavior:none}
+  body{padding-top:calc(var(--safe-top) + 56px);padding-bottom:calc(var(--safe-bot) + 80px);min-height:100vh}
+
+  /* HEADER */
+  .header{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    background:rgba(10,14,26,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+    padding:calc(var(--safe-top) + 10px) 16px 10px;
+  }
+  .header h1{margin:0;font-size:17px;font-weight:700;text-align:center;letter-spacing:.3px}
+  .header h1 span{color:var(--accent)}
+  .header .subtitle{margin:2px 0 0;font-size:11px;color:var(--txt-dim);text-align:center;font-weight:500}
+
+  /* TABBAR */
+  .tabbar{
+    position:fixed;left:0;right:0;bottom:0;z-index:100;
+    background:rgba(10,14,26,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border-top:1px solid var(--border);
+    padding:8px 0 calc(var(--safe-bot) + 8px);
+    display:flex;justify-content:space-around
+  }
+  .tabbar button{
+    background:none;border:0;color:var(--txt-dim);font-size:11px;font-weight:600;
+    display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 10px;
+    cursor:pointer;flex:1;font-family:inherit;transition:color .2s
+  }
+  .tabbar button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2}
+  .tabbar button.active{color:var(--accent)}
+
+  /* CONTAINER */
+  .container{max-width:680px;margin:0 auto;padding:16px}
+  .view{display:none}
+  .view.active{display:block;animation:fadeIn .25s}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* HERO */
+  .hero{
+    background:linear-gradient(135deg,#1a2138 0%,#13182e 100%);
+    border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px;margin-bottom:18px;position:relative;overflow:hidden
+  }
+  .hero::after{content:"";position:absolute;top:-40px;right:-40px;width:140px;height:140px;
+    background:radial-gradient(circle,rgba(0,255,163,.15),transparent 70%)}
+  .hero h2{margin:0 0 6px;font-size:20px}
+  .hero p{margin:0;color:var(--txt-dim);font-size:13px}
+  .hero-stats{display:flex;gap:10px;margin-top:14px;position:relative;z-index:1}
+  .stat-pill{flex:1;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+  .stat-pill .num{font-size:18px;font-weight:800;color:var(--accent)}
+  .stat-pill .lbl{font-size:10px;color:var(--txt-dim);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+  /* CARDS DE TEMA */
+  .topic{
+    background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+    margin-bottom:12px;overflow:hidden;
+  }
+  .topic-head{
+    padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+    user-select:none;-webkit-user-select:none
+  }
+  .topic-head h3{margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px}
+  .topic-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .topic-icon.t1{background:rgba(0,212,255,.15);color:var(--accent-2)}
+  .topic-icon.t2{background:rgba(255,181,71,.15);color:var(--warn)}
+  .topic-icon.t3{background:rgba(0,255,163,.15);color:var(--accent)}
+  .topic-icon.t4{background:rgba(255,77,109,.15);color:var(--err)}
+  .topic-icon.t5{background:rgba(170,140,255,.15);color:#aa8cff}
+  .topic-icon.t6{background:rgba(255,219,77,.15);color:#ffdb4d}
+  .chevron{width:18px;height:18px;color:var(--txt-dim);transition:transform .25s}
+  .topic.open .chevron{transform:rotate(90deg);color:var(--accent)}
+  .topic-body{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 16px}
+  .topic.open .topic-body{max-height:8000px;padding:0 16px 16px}
+  .topic-body h4{font-size:14px;color:var(--accent);margin:18px 0 6px;letter-spacing:.3px}
+  .topic-body h5{font-size:13px;color:var(--accent-2);margin:14px 0 4px}
+  .topic-body p{font-size:14px;color:#cdd4e4;margin:6px 0}
+  .topic-body ul{margin:6px 0 6px 18px;padding:0;font-size:14px}
+  .topic-body li{margin:5px 0;color:#cdd4e4}
+  .topic-body li b,.topic-body p b{color:var(--txt)}
+  .callout{
+    background:rgba(0,212,255,.08);border-left:3px solid var(--accent-2);
+    padding:10px 12px;margin:10px 0;border-radius:6px;font-size:13px
+  }
+  .callout.warn{background:rgba(255,181,71,.08);border-left-color:var(--warn)}
+  .callout.danger{background:rgba(255,77,109,.08);border-left-color:var(--err)}
+  .callout.ok{background:rgba(0,255,163,.08);border-left-color:var(--accent)}
+  .callout strong{display:block;margin-bottom:3px;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  /* LINKS PARA APROFUNDAR */
+  .deeper{
+    margin-top:18px;background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(0,255,163,.05));
+    border:1px solid rgba(0,212,255,.25);border-radius:12px;padding:14px;
+  }
+  .deeper-title{
+    display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
+    color:var(--accent-2);margin-bottom:10px;letter-spacing:.3px;text-transform:uppercase
+  }
+  .deeper ul{margin:0;padding:0;list-style:none}
+  .deeper li{margin:0;padding:0;border:0}
+  .deeper a{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:10px 12px;margin:4px 0;border-radius:8px;
+    background:rgba(0,0,0,.25);color:var(--txt);text-decoration:none;
+    font-size:13px;line-height:1.4;border:1px solid var(--border);
+    transition:background .15s,border-color .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .deeper a:active{background:rgba(0,212,255,.12);border-color:var(--accent-2)}
+  .deeper a .arr{color:var(--accent);font-weight:700;flex-shrink:0}
+  .deeper a .title{font-weight:600;color:var(--accent-2)}
+  .deeper a .desc{display:block;color:var(--txt-dim);font-size:11px;margin-top:2px}
+
+  /* Tabela compacta de pontos */
+  .ptable{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+  .ptable th,.ptable td{padding:8px 6px;text-align:center;border:1px solid var(--border)}
+  .ptable th{background:rgba(0,212,255,.1);color:var(--accent-2);font-weight:600}
+  .ptable tr td:first-child{text-align:left;font-weight:600}
+
+  /* Placas visuais (SVG inline) */
+  .placa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:10px 0}
+  .placa{background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:12px}
+  .placa svg{width:60px;height:60px;margin-bottom:4px}
+  .placa b{display:block;color:var(--txt);font-size:12px;margin-top:4px}
+  .placa span{display:block;color:var(--txt-dim);font-size:11px}
+
+  /* NÍVEIS DO SIMULADO */
+  .level-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:8px}
+  .level{
+    background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+    transition:transform .15s, border-color .2s;
+    width:100%;font-family:inherit;color:var(--txt);text-align:left;
+    -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent;
+  }
+  .level:active{transform:scale(.98)}
+  .level.facil{border-left:4px solid var(--ok)}
+  .level.medio{border-left:4px solid var(--warn)}
+  .level.dificil{border-left:4px solid var(--err)}
+  .level h3{margin:0 0 4px;font-size:16px}
+  .level p{margin:0;font-size:12px;color:var(--txt-dim)}
+  .level-arrow{color:var(--txt-dim);font-size:22px}
+
+  /* QUIZ */
+  .quiz-header{
+    background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px 16px;margin-bottom:14px
+  }
+  .quiz-progress{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--txt-dim);margin-bottom:8px}
+  .quiz-progress b{color:var(--txt)}
+  .progress-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .35s;width:0%}
+
+  .question-card{
+    background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 16px;margin-bottom:14px
+  }
+  .tema-tag{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--accent-2);background:rgba(0,212,255,.1);padding:4px 8px;border-radius:6px;margin-bottom:10px}
+  .question-text{font-size:16px;font-weight:600;color:var(--txt);margin:0 0 14px;line-height:1.5}
+  .options{display:flex;flex-direction:column;gap:8px}
+  .opt{
+    background:var(--bg-card-2);border:1.5px solid var(--border);border-radius:10px;
+    padding:13px 14px;font-size:14px;color:var(--txt);cursor:pointer;text-align:left;
+    transition:border-color .15s, background .15s;display:flex;align-items:flex-start;gap:10px;
+    font-family:inherit;width:100%
+  }
+  .opt:active{transform:scale(.99)}
+  .opt-letter{
+    flex:0 0 26px;height:26px;border-radius:50%;background:var(--border);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--txt-dim)
+  }
+  .opt.selected{border-color:var(--accent-2);background:rgba(0,212,255,.08)}
+  .opt.selected .opt-letter{background:var(--accent-2);color:#001220}
+  .opt.correct{border-color:var(--ok);background:rgba(0,255,163,.1)}
+  .opt.correct .opt-letter{background:var(--ok);color:#001a10}
+  .opt.wrong{border-color:var(--err);background:rgba(255,77,109,.1)}
+  .opt.wrong .opt-letter{background:var(--err);color:#2a0008}
+  .opt:disabled{opacity:.85;cursor:default}
+
+  .explanation{
+    background:rgba(0,255,163,.07);border:1px solid rgba(0,255,163,.25);border-radius:10px;
+    padding:12px;margin-top:14px;font-size:13px;color:#bce5d2;display:none
+  }
+  .explanation.show{display:block;animation:fadeIn .25s}
+  .explanation b{color:var(--accent);text-transform:uppercase;font-size:11px;letter-spacing:.5px;display:block;margin-bottom:5px}
+
+  /* BTN */
+  .btn{
+    display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#001220;border:0;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;
+    font-family:inherit;letter-spacing:.3px
+  }
+  .btn:active{transform:scale(.98)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;background:var(--border);color:var(--txt-dim)}
+  .btn.ghost{background:transparent;border:1.5px solid var(--border);color:var(--txt)}
+  .btn.danger{background:linear-gradient(135deg,#ff4d6d,#ff7e9c);color:#fff}
+
+  /* RESULTADO */
+  .result-card{
+    background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:24px 18px;text-align:center;margin-bottom:16px
+  }
+  .result-emoji{font-size:54px;margin-bottom:10px}
+  .result-score{font-size:38px;font-weight:800;margin:6px 0}
+  .result-score.ok{color:var(--ok)}
+  .result-score.fail{color:var(--err)}
+  .result-msg{font-size:14px;color:var(--txt-dim);margin-bottom:14px}
+  .result-meta{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+  .meta-chip{background:var(--bg-card-2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--txt-dim)}
+  .meta-chip b{color:var(--txt)}
+
+  /* HISTÓRICO */
+  .hist-item{
+    background:var(--bg-card);border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px
+  }
+  .hist-badge{
+    flex:0 0 44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:14px
+  }
+  .hist-badge.ok{background:rgba(0,255,163,.15);color:var(--accent)}
+  .hist-badge.fail{background:rgba(255,77,109,.15);color:var(--err)}
+  .hist-info{flex:1;min-width:0}
+  .hist-info h4{margin:0 0 2px;font-size:14px}
+  .hist-info p{margin:0;font-size:12px;color:var(--txt-dim)}
+  .empty{text-align:center;padding:40px 20px;color:var(--txt-dim);font-size:14px}
+  .empty svg{width:60px;height:60px;margin-bottom:10px;color:var(--border)}
+
+  /* MISC */
+  .quiz-actions{display:flex;flex-direction:column;gap:8px}
+  .review-q{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;font-size:13px}
+  .review-q.ok{border-left:3px solid var(--ok)}
+  .review-q.bad{border-left:3px solid var(--err)}
+  .review-q b{display:block;color:var(--txt);font-size:13px;margin-bottom:4px}
+  .review-q span{color:var(--txt-dim);font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Prova <span>DETRAN MG</span></h1>
+  <p class="subtitle">Estude · Simule · Aprove</p>
+</div>
+
+<div class="container">
+
+  <!-- ============== VIEW ESTUDAR ============== -->
+  <div id="view-estudar" class="view active">
+    <div class="hero">
+      <h2>Apostila Completa</h2>
+      <p>Conteúdo programático integral da prova teórica do DETRAN-MG (2026). Toque em cada eixo para abrir.</p>
+      <div class="hero-stats">
+        <div class="stat-pill"><div class="num">30</div><div class="lbl">Questões</div></div>
+        <div class="stat-pill"><div class="num">20</div><div class="lbl">Para passar</div></div>
+        <div class="stat-pill"><div class="num">67%</div><div class="lbl">Mínimo</div></div>
+      </div>
+      <p style="margin-top:10px;font-size:11px;color:var(--accent-2)">⚡ Nova regra (Resolução 1020/2025 do CONTRAN)</p>
+    </div>
+
+    <!-- ========== TÓPICO 1: LEGISLAÇÃO DE TRÂNSITO ========== -->
+    <div class="topic" data-topic>
+      <div class="topic-head">
+        <h3><span class="topic-icon t1">⚖️</span> Legislação de Trânsito</h3>
+        <span class="chevron">›</span>
+      </div>
+      <div class="topic-body">
+
+        <h4>1.1 O Código de Trânsito Brasileiro (CTB)</h4>
+        <p>O <b>CTB</b> é a <b>Lei nº 9.503, de 23 de setembro de 1997</b>. Regulamenta o trânsito de qualquer natureza em vias terrestres do território nacional, abertas à circulação. Possui 341 artigos divididos em 20 capítulos.</p>
+        <p><b>Art. 1º, § 2º:</b> "O trânsito, em condições seguras, é um direito de todos e dever dos órgãos e entidades componentes do Sistema Nacional de Trânsito."</p>
+
+        <h4>1.2 Sistema Nacional de Trânsito (SNT)</h4>
+        <p>Hierarquia dos órgãos:</p>
+        <ul>
+          <li><b>CONTRAN</b> — Conselho Nacional de Trânsito. Órgão <b>máximo normativo e consultivo</b>. Edita Resoluções aplicáveis em todo o país.</li>
+          <li><b>SENATRAN</b> — Secretaria Nacional de Trânsito. Órgão <b>executivo</b> federal (antigo DENATRAN).</li>
+          <li><b>CETRAN/CONTRANDIFE</b> — Conselhos Estaduais. Órgãos normativos/consultivos no nível estadual.</li>
+          <li><b>DETRAN</b> — Departamentos Estaduais. Órgão <b>executivo de trânsito do Estado</b>. É quem emite a CNH.</li>
+          <li><b>DER</b> — Departamento de Estradas de Rodagem. Executivo rodoviário estadual.</li>
+          <li><b>Órgãos municipais</b> — Executivos de trânsito do Município (BHTrans em BH, por exemplo).</li>
+          <li><b>PRF</b> — Polícia Rodoviária Federal. Fiscalização em rodovias federais.</li>
+          <li><b>PMRv</b> — Polícia Militar Rodoviária Estadual. Rodovias estaduais.</li>
+        </ul>
+
+        <h4>1.3 Habilitação (CNH)</h4>
+        <p><b>Requisitos para a primeira CNH:</b></p>
+        <ul>
+          <li>Ser <b>penalmente imputável</b> (18 anos completos)</li>
+          <li>Saber ler e escrever</li>
+          <li>Possuir documento de identidade e CPF</li>
+        </ul>
+        <p><b>Etapas do processo:</b></p>
+        <ul>
+          <li>Exames de aptidão física e mental</li>
+          <li>Avaliação psicológica</li>
+          <li>Curso teórico (gratuito e online pelo app "CNH do Brasil", ou em CFC)</li>
+          <li>Prova teórica (30 questões, mín. 20 acertos — Resolução 1020/2025)</li>
+          <li>Curso prático de direção</li>
+          <li>Prova prática</li>
+        </ul>
+
+        <h4>1.4 Categorias da CNH</h4>
+        <ul>
+          <li><b>ACC</b> — Autorização para Conduzir Ciclomotor (até 50 cilindradas e até 50 km/h)</li>
+          <li><b>A</b> — Motocicletas, motonetas, triciclos e ciclomotores</li>
+          <li><b>B</b> — Veículos motorizados de 4 rodas até <b>3.500 kg</b> de PBT e até 8 passageiros (excluído o motorista)</li>
+          <li><b>C</b> — Veículos motorizados acima de 3.500 kg (caminhões)</li>
+          <li><b>D</b> — Veículos motorizados para transporte de <b>mais de 8 passageiros</b> (ônibus, micro-ônibus)</li>
+          <li><b>E</b> — Combinação de veículos (unidade tratora + reboque) com PBT acima de 6.000 kg</li>
+        </ul>
+        <p><b>Para C, D, E:</b> exige <b>1 ano</b> na categoria anterior (B para C; B+1 ano com C para D ou E), idade mínima de 21 anos para D, sem cometer infração grave/gravíssima nos últimos 12 meses, e exame toxicológico.</p>
+
+        <h4>1.5 PPD — Permissão para Dirigir</h4>
+        <p>Após aprovação nos exames, o candidato recebe a <b>PPD válida por 1 ano</b>. Para obter a CNH definitiva, deve:</p>
+        <ul>
+          <li>Não cometer <b>nenhuma</b> infração de natureza <b>grave ou gravíssima</b>;</li>
+          <li>Não ser <b>reincidente</b> em infração média.</li>
+        </ul>
+        <p>Se cometer uma dessas, refaz todo o processo (cursos e provas).</p>
+
+        <h4>1.6 Renovação da CNH (Lei 14.071/2020)</h4>
+        <ul>
+          <li><b>Até 49 anos:</b> renovação a cada <b>10 anos</b></li>
+          <li><b>De 50 a 69 anos:</b> a cada <b>5 anos</b></li>
+          <li><b>70 anos ou mais:</b> a cada <b>3 anos</b></li>
+          <li>Para EAR (Exercício de Atividade Remunerada), renovação a cada <b>5 anos</b> independentemente da idade (com exame toxicológico para C/D/E)</li>
+        </ul>
+
+        <h4>1.7 Sistema de Pontuação (Lei 14.071/2020)</h4>
+        <p>A CNH é suspensa quando o condutor atinge, em 12 meses:</p>
+        <ul>
+          <li><b>20 pontos</b> — se tiver <b>2 ou mais</b> infrações gravíssimas</li>
+          <li><b>30 pontos</b> — se tiver <b>1</b> infração gravíssima</li>
+          <li><b>40 pontos</b> — se <b>não tiver</b> nenhuma infração gravíssima</li>
+          <li><b>EAR</b> (motorista profissional): sempre 40 pontos, independente</li>
+        </ul>
+
+        <h4>1.8 Classificação das Infrações (Art. 259 CTB)</h4>
+        <p>Valores vigentes (UFIR a R$ 4,4072):</p>
+        <ul>
+          <li><b>Leve:</b> 3 pontos — <b>R$ 88,38</b></li>
+          <li><b>Média:</b> 4 pontos — <b>R$ 130,16</b></li>
+          <li><b>Grave:</b> 5 pontos — <b>R$ 195,23</b></li>
+          <li><b>Gravíssima:</b> 7 pontos — <b>R$ 293,47</b></li>
+        </ul>
+        <p><b>Multiplicadores</b> (multa gravíssima × fator):</p>
+        <ul>
+          <li><b>x2</b> — algumas situações específicas</li>
+          <li><b>x3</b> — velocidade acima de 50% do limite (R$ 880,41); transporte irregular de criança</li>
+          <li><b>x5</b> — algumas reincidências</li>
+          <li><b>x10</b> — dirigir alcoolizado (Art. 165) e recusar bafômetro (Art. 165-A): <b>R$ 2.934,70</b></li>
+        </ul>
+
+        <h4>1.9 Principais Infrações que mais caem na prova</h4>
+        <ul>
+          <li><b>Art. 162 I</b> — Dirigir sem CNH: <b>gravíssima x3</b>, veículo retido</li>
+          <li><b>Art. 162 II</b> — Dirigir com CNH cassada/suspensa: <b>gravíssima x3</b></li>
+          <li><b>Art. 165</b> — Dirigir sob efeito de álcool: <b>gravíssima x10</b>, suspensão 12 meses</li>
+          <li><b>Art. 165-A</b> — Recusar bafômetro: <b>gravíssima x10</b>, suspensão 12 meses</li>
+          <li><b>Art. 169</b> — Dirigir sem prudência: leve</li>
+          <li><b>Art. 173</b> — Disputar corrida (racha): <b>gravíssima x10</b>, suspensão e retenção</li>
+          <li><b>Art. 174</b> — Promover corrida não autorizada: <b>gravíssima x5</b></li>
+          <li><b>Art. 175</b> — "Cavalo de pau"/manobras perigosas: <b>gravíssima x5</b></li>
+          <li><b>Art. 181 X</b> — Estacionar em fila dupla: <b>grave</b></li>
+          <li><b>Art. 186</b> — Andar pela contramão: <b>grave</b> (gravíssima em pista dupla)</li>
+          <li><b>Art. 192</b> — Não dar passagem a veículo de emergência (sirene+giroflex): <b>gravíssima</b></li>
+          <li><b>Art. 199</b> — Ultrapassar pela direita: <b>grave</b></li>
+          <li><b>Art. 203</b> — Ultrapassar em local proibido: <b>gravíssima</b></li>
+          <li><b>Art. 208</b> — Avançar sinal vermelho: <b>gravíssima</b>, 7 pontos</li>
+          <li><b>Art. 210</b> — Transpor bloqueio policial sem autorização: <b>gravíssima</b></li>
+          <li><b>Art. 214</b> — Não dar preferência a pedestre na faixa: <b>gravíssima</b></li>
+          <li><b>Art. 218</b> — Excesso de velocidade:
+            <ul>
+              <li>Até 20% acima: <b>média</b></li>
+              <li>De 20% a 50%: <b>grave</b></li>
+              <li>Acima de 50%: <b>gravíssima x3</b> + suspensão imediata</li>
+            </ul>
+          </li>
+          <li><b>Art. 230</b> — Equipamento obrigatório defeituoso/sem licenciamento: <b>graves</b> diversas</li>
+          <li><b>Art. 244</b> — Conduzir motocicleta sem capacete: <b>gravíssima</b></li>
+          <li><b>Art. 252 § único</b> — Dirigir usando celular na mão: <b>gravíssima</b></li>
+        </ul>
+
+        <h4>1.10 Crimes de Trânsito (Capítulo XIX)</h4>
+        <ul>
+          <li><b>Art. 302</b> — Homicídio culposo no trânsito: <b>reclusão 5 a 8 anos</b> + suspensão/proibição CNH. Pena aumentada se sob efeito de álcool/drogas.</li>
+          <li><b>Art. 303</b> — Lesão corporal culposa: detenção 6 meses a 2 anos.</li>
+          <li><b>Art. 304</b> — Omissão de socorro: detenção 6 meses a 1 ano ou multa.</li>
+          <li><b>Art. 305</b> — Afastar-se do local para fugir à responsabilidade: detenção 6 meses a 1 ano ou multa.</li>
+          <li><b>Art. 306</b> — Embriaguez ao volante (≥ 6 dg/L sangue OU ≥ 0,3 mg/L ar alveolar OU sinais inequívocos): <b>detenção 6 meses a 3 anos</b> + suspensão CNH.</li>
+          <li><b>Art. 308</b> — Racha/manobra arriscada gerando perigo: detenção 6 meses a 3 anos. Se resultar em morte: <b>reclusão 5 a 10 anos</b>.</li>
+          <li><b>Art. 309</b> — Dirigir sem habilitação gerando perigo: detenção 6 meses a 1 ano.</li>
+          <li><b>Art. 310</b> — Permitir/entregar veículo a pessoa não habilitada: detenção 6 meses a 1 ano.</li>
+          <li><b>Art. 311</b> — Velocidade incompatível em escolas, hospitais, área residencial: detenção 6 meses a 1 ano.</li>
+          <li><b>Art. 312</b> — Inovar artificiosamente local de acidente: detenção 6 meses a 1 ano.</li>
+        </ul>
+
+        <h4>1.11 Velocidades Máximas (sem sinalização)</h4>
+        <p><b>Vias urbanas:</b></p>
+        <ul>
+          <li><b>Trânsito rápido:</b> 80 km/h</li>
+          <li><b>Arterial:</b> 60 km/h</li>
+          <li><b>Coletora:</b> 40 km/h</li>
+          <li><b>Local:</b> 30 km/h</li>
+        </ul>
+        <p><b>Vias rurais:</b></p>
+        <ul>
+          <li><b>Rodovia de pista dupla:</b> 110 carros / 90 ônibus / 80 demais</li>
+          <li><b>Rodovia de pista simples:</b> 100 carros / 90 ônibus / 80 demais</li>
+          <li><b>Estrada (não pavimentada):</b> 60 km/h</li>
+        </ul>
+
+        <h4>1.12 Regras Gerais de Circulação (Art. 26 a 67)</h4>
+        <ul>
+          <li>A circulação se dá pelo <b>lado direito</b> da via (Art. 28)</li>
+          <li><b>Ultrapassagem</b> deve ser feita pela <b>esquerda</b>, com segurança e sinalização (Art. 29 IX)</li>
+          <li>Em cruzamento sem sinalização, prevalece quem vem pela <b>direita</b> (Art. 29 III c)</li>
+          <li>Veículo na rotatória tem preferência sobre quem entra</li>
+          <li>Pedestre tem preferência absoluta em faixa, mesmo sem semáforo</li>
+          <li>Veículos de emergência com sirene + giroflex acionados têm <b>prioridade de passagem</b> (Art. 29 VII)</li>
+          <li>Em rodovia, ônibus e caminhões devem usar a faixa da <b>direita</b>; central só para velocidades intermediárias; esquerda apenas para ultrapassagem</li>
+          <li>É proibido conversar com motorista de ônibus em movimento</li>
+        </ul>
+
+        <h4>1.13 Documentos obrigatórios ao dirigir</h4>
+        <ul>
+          <li><b>CNH</b> (Carteira Nacional de Habilitação) — pode ser <b>digital</b> (CDT — Carteira Digital de Trânsito)</li>
+          <li><b>CRLV</b> (Certificado de Registro e Licenciamento de Veículo) — também aceito digital</li>
+        </ul>
+
+        <h4>1.14 Equipamentos Obrigatórios do Veículo</h4>
+        <ul>
+          <li>Cinto de segurança para todos os ocupantes</li>
+          <li>Encosto de cabeça</li>
+          <li>Estepe, macaco e chave de roda</li>
+          <li>Triângulo de sinalização</li>
+          <li>Faróis (alto e baixo), lanternas, luz de freio, indicadores de direção (setas), luz de placa, ré</li>
+          <li>Buzina</li>
+          <li>Espelhos retrovisores (interno + 2 externos)</li>
+          <li>Limpador e lavador de para-brisa</li>
+          <li>Velocímetro e hodômetro</li>
+          <li>Pneus com profundidade mínima de <b>1,6 mm</b></li>
+          <li><b>Extintor:</b> não é mais obrigatório para automóveis de passeio (desde 2015). Continua obrigatório para coletivos, carga e transporte de produtos perigosos.</li>
+        </ul>
+
+        <div class="callout"><strong>⚠️ Atenção</strong> Cometeu infração e foi multado? Você tem direito a apresentar <b>defesa prévia</b> (antes da aplicação da penalidade) e <b>recurso</b> (após a notificação) à JARI e ao CETRAN.</div>
+
+        <div class="deeper">
+          <div class="deeper-title">🔗 Links para aprofundar</div>
+          <ul>
+            <li><a href="https://www.planalto.gov.br/ccivil_03/leis/l9503compilado.htm" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">CTB completo (Planalto)</span><span class="desc">Lei 9.503/97 com todas as alterações</span></span></a></li>
+            <li><a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2020/lei/L14071.htm" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Lei 14.071/2020</span><span class="desc">Nova Lei de Trânsito (pontos, renovação)</span></span></a></li>
+            <li><a href="https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-contran/resolucoes" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Resoluções do CONTRAN</span><span class="desc">Todas as normas vigentes</span></span></a></li>
+            <li><a href="https://www.mg.gov.br/servico/obter-1a-habilitacao-cnh-ou-acc" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">1ª Habilitação em MG</span><span class="desc">Portal oficial do Governo de MG</span></span></a></li>
+            <li><a href="https://www.detran.mg.gov.br/" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">DETRAN-MG</span><span class="desc">Site oficial — agendamentos e serviços</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TÓPICO 2: SINALIZAÇÃO ========== -->
+    <div class="topic" data-topic>
+      <div class="topic-head">
+        <h3><span class="topic-icon t2">🚦</span> Sinalização de Trânsito</h3>
+        <span class="chevron">›</span>
+      </div>
+      <div class="topic-body">
+
+        <h4>2.1 Tipos de Sinalização</h4>
+        <ul>
+          <li><b>Vertical</b> — placas fixadas em postes/suportes</li>
+          <li><b>Horizontal</b> — pinturas no pavimento (linhas, símbolos, letreiros)</li>
+          <li><b>Semafórica</b> — luzes (focos veiculares e de pedestres)</li>
+          <li><b>Sonora</b> — sinais sonoros (apito do agente, semáforo sonoro para deficientes visuais)</li>
+          <li><b>Gestos</b> — do agente de trânsito e do condutor</li>
+          <li><b>Dispositivos auxiliares</b> — tachões, balizadores, lombadas eletrônicas</li>
+        </ul>
+
+        <h4>2.2 Ordem de Prevalência (Art. 89 CTB)</h4>
+        <p>Se houver conflito entre sinais, vale a ordem:</p>
+        <ul>
+          <li>1º — <b>Agente</b> de trânsito (gestos e ordens verbais)</li>
+          <li>2º — <b>Semáforo</b></li>
+          <li>3º — <b>Sinalização vertical</b> (placas)</li>
+          <li>4º — <b>Sinalização horizontal</b> (marcas no pavimento)</li>
+          <li>5º — <b>Regras gerais</b> de circulação do CTB</li>
+        </ul>
+
+        <h4>2.3 Sinalização Vertical — Regulamentação (R)</h4>
+        <p>Indicam <b>obrigações, proibições e restrições</b>. Forma circular (exceto R-1 e R-2). Cores: <b>fundo branco, orla vermelha, símbolos pretos</b>.</p>
+        <ul>
+          <li><b>R-1</b> Parada Obrigatória (octogonal vermelha, PARE)</li>
+          <li><b>R-2</b> Dê a Preferência (triangular invertida)</li>
+          <li><b>R-3</b> Sentido Proibido (círculo com tarja branca — "contramão")</li>
+          <li><b>R-4a</b> Proibido Virar à Esquerda</li>
+          <li><b>R-4b</b> Proibido Virar à Direita</li>
+          <li><b>R-5a</b> Proibido Retornar à Esquerda</li>
+          <li><b>R-6a</b> Proibido Estacionar</li>
+          <li><b>R-6b</b> Estacionamento Regulamentado</li>
+          <li><b>R-6c</b> Proibido Parar e Estacionar</li>
+          <li><b>R-7</b> Proibido Ultrapassar</li>
+          <li><b>R-8a</b> Proibido Mudar de Faixa da Esquerda para a Direita</li>
+          <li><b>R-9</b> Proibido Trânsito de Caminhões</li>
+          <li><b>R-15</b> Altura Máxima Permitida</li>
+          <li><b>R-16</b> Largura Máxima</li>
+          <li><b>R-17</b> Peso Máximo</li>
+          <li><b>R-19</b> <b>Velocidade Máxima Permitida</b></li>
+          <li><b>R-24a</b> Sentido Obrigatório (azul, seta)</li>
+          <li><b>R-25</b> Vire à Esquerda/Direita Obrigatório</li>
+          <li><b>R-29</b> Proibido Trânsito de Pedestres</li>
+          <li><b>R-32</b> Circulação Exclusiva de Ônibus</li>
+          <li><b>R-34</b> Circulação Exclusiva de Bicicletas</li>
+          <li><b>R-37</b> Proibido Trânsito de Motocicletas</li>
+          <li><b>R-40</b> Trânsito Compulsório (azul) — uso de pneus para neve etc.</li>
+        </ul>
+
+        <h4>2.4 Sinalização Vertical — Advertência (A)</h4>
+        <p>Alertam sobre <b>condições potencialmente perigosas</b>. Forma de <b>losango</b>. Cores: <b>fundo amarelo, orla preta, símbolos pretos</b>.</p>
+        <ul>
+          <li><b>A-1a/1b</b> Curva Acentuada à Esquerda/Direita</li>
+          <li><b>A-2a/2b</b> Curva à Esquerda/Direita</li>
+          <li><b>A-3a/3b</b> Pista Sinuosa</li>
+          <li><b>A-7a</b> Via Lateral (Esquerda ou Direita)</li>
+          <li><b>A-8</b> Interseção em "T"</li>
+          <li><b>A-9</b> Bifurcação em "Y"</li>
+          <li><b>A-11a</b> Junções Sucessivas</li>
+          <li><b>A-13a</b> Confluência à Esquerda</li>
+          <li><b>A-14</b> <b>Sinalização Semafórica à Frente</b></li>
+          <li><b>A-15</b> Parada Obrigatória à Frente</li>
+          <li><b>A-16</b> Cruzamento (Bonde)</li>
+          <li><b>A-17</b> Pista Irregular</li>
+          <li><b>A-18</b> Saliência ou Lombada</li>
+          <li><b>A-20a</b> Declive Acentuado</li>
+          <li><b>A-21a</b> Estreitamento de Pista ao Centro</li>
+          <li><b>A-24</b> Obras</li>
+          <li><b>A-26a</b> Sentido Único</li>
+          <li><b>A-26b</b> Sentido Duplo de Circulação</li>
+          <li><b>A-28</b> Via Sem Saída</li>
+          <li><b>A-29</b> Projeção de Cascalho</li>
+          <li><b>A-30a</b> Trânsito de Ciclistas</li>
+          <li><b>A-32a</b> Trânsito de Pedestres</li>
+          <li><b>A-32b</b> Passagem Sinalizada de Pedestres</li>
+          <li><b>A-33a</b> Área Escolar (símbolo de crianças)</li>
+          <li><b>A-34</b> Crianças</li>
+          <li><b>A-35</b> Animais (silvestres ou domésticos)</li>
+          <li><b>A-36</b> Animais Domésticos</li>
+          <li><b>A-38</b> Altura Limitada</li>
+          <li><b>A-41</b> Cruz de Santo André (passagem ferroviária)</li>
+          <li><b>A-42a</b> Início de Pista Dupla</li>
+          <li><b>A-44</b> Aeroporto</li>
+        </ul>
+
+        <h4>2.5 Sinalização Vertical — Indicação</h4>
+        <p>Identificam vias, fornecem orientação, prestam informações úteis. Cores variam:</p>
+        <ul>
+          <li><b>Verde</b> — orientação de destino em rodovias e vias urbanas</li>
+          <li><b>Azul</b> — orientação em vias urbanas e atrativos turísticos</li>
+          <li><b>Marrom</b> — pontos turísticos e culturais</li>
+          <li><b>Branca</b> — placas educativas e informativas</li>
+          <li><b>Laranja</b> — sinalização de obras (temporária)</li>
+        </ul>
+
+        <h4>2.6 Sinalização Horizontal — Cores e Significados</h4>
+        <ul>
+          <li><b>Amarela</b> — separa fluxos opostos (mãos contrárias) / regulamenta estacionamento</li>
+          <li><b>Branca</b> — separa fluxos no mesmo sentido / delimita faixas / regulamenta travessia de pedestres</li>
+          <li><b>Vermelha</b> — ciclofaixas/ciclovias / sinaliza farmácias e hospitais (cruz vermelha)</li>
+          <li><b>Azul</b> — vagas especiais para PcD</li>
+          <li><b>Preta</b> — fornece contraste com pavimento claro (apenas auxiliar)</li>
+        </ul>
+
+        <h4>2.7 Linhas Longitudinais</h4>
+        <ul>
+          <li><b>Linha amarela contínua</b> — <b>proíbe</b> ultrapassar/transpor</li>
+          <li><b>Linha amarela tracejada</b> — permite ultrapassagem com segurança</li>
+          <li><b>Linha amarela dupla contínua</b> — proibido ultrapassar em <b>ambos os sentidos</b></li>
+          <li><b>Linha amarela contínua + tracejada</b> — proibido só para o lado da contínua</li>
+          <li><b>Linha branca contínua</b> — proíbe mudança de faixa</li>
+          <li><b>Linha branca tracejada</b> — permite mudança de faixa com segurança</li>
+        </ul>
+
+        <h4>2.8 Marcas Transversais</h4>
+        <ul>
+          <li><b>Linha de retenção</b> — onde você deve parar diante de PARE ou semáforo</li>
+          <li><b>Linha de "Dê a Preferência"</b> — tracejada larga, antes de cruzamento</li>
+          <li><b>Faixa de pedestres</b> — listras brancas paralelas (zebra)</li>
+        </ul>
+
+        <h4>2.9 Marcações Especiais</h4>
+        <ul>
+          <li><b>Zebrado de canalização (em V ou paralelas)</b> — <b>área neutra</b>, proibido invadir</li>
+          <li><b>Setas direcionais</b> — indicam o movimento permitido naquela faixa</li>
+          <li><b>Símbolos no pavimento</b> — ciclista, pedestre, cadeirante, ônibus etc.</li>
+        </ul>
+
+        <h4>2.10 Sinalização Semafórica</h4>
+        <ul>
+          <li><b>Verde</b> — passagem permitida</li>
+          <li><b>Amarelo</b> — <b>atenção</b>: o sinal vai mudar; pare se for seguro; siga apenas se já estiver muito próximo ao cruzamento</li>
+          <li><b>Vermelho</b> — <b>parada obrigatória</b>. Avançar = infração gravíssima (Art. 208)</li>
+          <li><b>Amarelo intermitente (piscante)</b> — atenção redobrada; preferência da via principal; geralmente em horários de menor movimento</li>
+          <li><b>Vermelho intermitente</b> — pare e prossiga com cautela quando seguro</li>
+        </ul>
+        <p><b>Foco para pedestre:</b></p>
+        <ul>
+          <li><b>Verde fixo</b> — atravesse</li>
+          <li><b>Vermelho fixo</b> — não atravesse</li>
+          <li><b>Verde piscante</b> — termine de atravessar; não inicie</li>
+        </ul>
+
+        <h4>2.11 Gestos do Agente de Trânsito</h4>
+        <ul>
+          <li><b>Braço estendido na vertical</b> — pare para todos os fluxos que o veem</li>
+          <li><b>Braço estendido horizontalmente, palma para frente</b> — pare para quem está naquela direção</li>
+          <li><b>Braço fazendo movimento de "venha"</b> — siga</li>
+          <li><b>Apito longo</b> — pare. Apito curto repetido — siga ou atenção</li>
+        </ul>
+
+        <div class="callout"><strong>🧠 Macete:</strong> branca-vermelho-pretas → <b>REGULAMENTAÇÃO</b> (obrigação). Amarela-losango → <b>ADVERTÊNCIA</b> (alerta). Azul/verde → <b>INDICAÇÃO</b> (informação).</div>
+
+        <div class="deeper">
+          <div class="deeper-title">🔗 Links para aprofundar</div>
+          <ul>
+            <li><a href="https://www.gov.br/transportes/pt-br/assuntos/transito/senatran/manuais-brasileiros-de-sinalizacao-de-transito" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Manuais Brasileiros de Sinalização</span><span class="desc">9 volumes oficiais (placas, semáforos, marcas no chão)</span></span></a></li>
+            <li><a href="https://www.gov.br/transportes/pt-br/assuntos/transito/arquivos-senatran/educacao/publicacoes/manual_vol_i_2.pdf" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Vol. I — Placas de Regulamentação</span><span class="desc">PDF oficial com todas as placas R-1 a R-40</span></span></a></li>
+            <li><a href="https://www.gov.br/transportes/pt-br/assuntos/transito/arquivos-senatran/educacao/publicacoes/manual_vol_iv_2.pdf" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Vol. IV — Sinalização Horizontal</span><span class="desc">Linhas e marcas no pavimento</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TÓPICO 3: DIREÇÃO DEFENSIVA ========== -->
+    <div class="topic" data-topic>
+      <div class="topic-head">
+        <h3><span class="topic-icon t3">🛡️</span> Direção Defensiva</h3>
+        <span class="chevron">›</span>
+      </div>
+      <div class="topic-body">
+
+        <h4>3.1 Conceito</h4>
+        <p>Direção Defensiva é a forma de dirigir que permite reconhecer com antecipação as situações de perigo e agir para evitar acidentes — <b>apesar das ações erradas dos outros</b> e das condições adversas da via e do veículo.</p>
+
+        <h4>3.2 Os 5 Elementos Básicos da Direção Defensiva</h4>
+        <ul>
+          <li><b>Conhecimento</b> — leis, sinalização, técnicas de direção</li>
+          <li><b>Atenção</b> — concentração no trânsito</li>
+          <li><b>Previsão</b> — antecipar o perigo</li>
+          <li><b>Habilidade</b> — domínio prático do veículo</li>
+          <li><b>Ação</b> — capacidade de decidir e agir corretamente</li>
+        </ul>
+
+        <h4>3.3 Modelo VER-PREVER-AGIR (SIPDE)</h4>
+        <ul>
+          <li><b>VER</b> — observe o cenário todo (frente, retrovisores, lateral)</li>
+          <li><b>PREVER</b> — imagine o que <i>pode</i> acontecer (criança que pode atravessar; carro que pode frear)</li>
+          <li><b>AGIR</b> — reduza velocidade, mude de faixa, dê seta, freie suavemente</li>
+        </ul>
+
+        <h4>3.4 Tipos de Acidente</h4>
+        <ul>
+          <li><b>Evitável</b> — quando o condutor poderia ter feito algo para evitar (a maioria)</li>
+          <li><b>Inevitável</b> — quando, mesmo com toda prudência, não havia como evitar</li>
+        </ul>
+        <p>Direção defensiva trata todo acidente como <b>evitável</b> até prova em contrário.</p>
+
+        <h4>3.5 As 6 Condições Adversas</h4>
+        <ul>
+          <li><b>Via</b> — buracos, sinalização ruim, curvas perigosas, obras</li>
+          <li><b>Tempo (clima)</b> — chuva, neblina, vento forte, sol baixo</li>
+          <li><b>Trânsito</b> — congestionamento, motoristas imprudentes, ciclistas, pedestres</li>
+          <li><b>Luz</b> — noite, contraluz, túnel, ofuscamento</li>
+          <li><b>Veículo</b> — pneus, freios, faróis, suspensão em mau estado</li>
+          <li><b>Condutor</b> — sono, fadiga, álcool, raiva, pressa, celular, doenças</li>
+        </ul>
+
+        <h4>3.6 Causas Humanas de Acidente</h4>
+        <p>Mais de 80% dos acidentes têm causa humana:</p>
+        <ul>
+          <li><b>Imprudência</b> — agir sem cautela (correr, ultrapassar errado)</li>
+          <li><b>Imperícia</b> — falta de habilidade técnica</li>
+          <li><b>Negligência</b> — omissão (não fazer manutenção, não usar cinto)</li>
+        </ul>
+
+        <h4>3.7 Distância de Seguimento — Regra dos 2 Segundos</h4>
+        <p>Escolha um ponto fixo (placa, árvore). Quando o veículo da frente passar, conte: "<i>mil e um, mil e dois</i>". Se você passar pelo ponto antes de terminar, está <b>muito próximo</b>.</p>
+        <ul>
+          <li><b>Pista seca, dia claro:</b> 2 segundos</li>
+          <li><b>Chuva, neblina, noite:</b> aumente para <b>3 a 4 segundos</b></li>
+          <li><b>Veículo pesado atrás de você:</b> aumente também</li>
+        </ul>
+
+        <h4>3.8 Tempo de Reação</h4>
+        <p>Motorista atento e bem descansado: <b>0,75 segundo</b>. A 100 km/h, isso significa <b>~21 metros</b> percorridos antes mesmo de começar a frear. Com álcool, celular ou sono, esse tempo dobra ou triplica.</p>
+
+        <h4>3.9 Distância Total de Parada</h4>
+        <p>D total = D de reação + D de frenagem</p>
+        <ul>
+          <li>40 km/h → ~17 m total</li>
+          <li>60 km/h → ~32 m total</li>
+          <li>80 km/h → ~52 m total</li>
+          <li>100 km/h → ~78 m total</li>
+        </ul>
+
+        <h4>3.10 Visão e Pontos Cegos</h4>
+        <ul>
+          <li><b>Visão central</b> — foco direto</li>
+          <li><b>Visão periférica</b> — capta movimento sem olhar diretamente (essencial)</li>
+          <li><b>Ponto cego</b> — áreas laterais-traseiras não cobertas pelos retrovisores. Sempre faça <b>giro rápido de cabeça</b> antes de mudar de faixa</li>
+        </ul>
+
+        <h4>3.11 Ultrapassagem Segura — 8 Passos</h4>
+        <ul>
+          <li>1. Verifique se a sinalização permite</li>
+          <li>2. Cheque retrovisores</li>
+          <li>3. Acione a seta esquerda</li>
+          <li>4. Confirme que ninguém vem em sentido contrário a tempo</li>
+          <li>5. Acelere e ultrapasse com segurança</li>
+          <li>6. Mantenha distância lateral do veículo ultrapassado</li>
+          <li>7. Acione a seta direita ao retornar</li>
+          <li>8. Volte à faixa apenas quando enxergar o veículo ultrapassado no retrovisor</li>
+        </ul>
+
+        <h4>3.12 Condução em Chuva</h4>
+        <ul>
+          <li>Reduza velocidade</li>
+          <li>Aumente distância de seguimento</li>
+          <li>Use <b>farol baixo</b> (não alto — reflete e ofusca)</li>
+          <li>Evite freadas e curvas bruscas</li>
+          <li>Cuidado redobrado nas primeiras gotas (óleo + água = pista escorregadia)</li>
+        </ul>
+
+        <h4>3.13 Aquaplanagem</h4>
+        <p>Lâmina d'água entre o pneu e o asfalto faz o veículo "flutuar". Pneu perde aderência, direção e frenagem ficam inertes.</p>
+        <p><b>Como agir:</b> <b>NÃO</b> freie nem vire bruscamente. Tire o pé do acelerador, segure o volante firme em linha reta e aguarde recuperar a aderência.</p>
+        <p><b>Como prevenir:</b> pneus calibrados e com sulcos &gt; 1,6 mm; velocidade reduzida em pista molhada.</p>
+
+        <h4>3.14 Condução à Noite e em Neblina</h4>
+        <ul>
+          <li><b>Noite:</b> reduza velocidade (até 20%), evite olhar direto para faróis altos vindo na contramão (olhe para a margem direita), mantenha para-brisa limpo</li>
+          <li><b>Neblina:</b> <b>farol baixo</b> + farol de neblina se houver; <b>NUNCA</b> farol alto (a luz reflete na névoa e cega); pisca-alerta apenas se quase parado; siga as linhas da pista</li>
+        </ul>
+
+        <h4>3.15 Curvas</h4>
+        <p>Reduza <b>antes</b> da curva. Faça a curva em marcha estável. Acelere progressivamente <b>na saída</b>. Nunca freie no meio da curva (risco de derrapar/capotar).</p>
+
+        <h4>3.16 Derrapagem</h4>
+        <ul>
+          <li>Tire o pé do acelerador e do freio</li>
+          <li>Esterce o volante <b>no mesmo sentido</b> da derrapagem (se traseira sai para a direita, vire o volante para a direita)</li>
+          <li>Recupere o controle gradualmente</li>
+        </ul>
+
+        <h4>3.17 Álcool e Direção</h4>
+        <p>Álcool é depressor do sistema nervoso central. Reduz reflexos, distorce percepção de distância e velocidade, dá falsa sensação de segurança. Mesmo doses pequenas afetam.</p>
+        <p><b>Tolerância no Brasil: ZERO.</b> Qualquer concentração detectada = infração gravíssima x10. Acima de 0,3 mg/L de ar = crime (Art. 306).</p>
+
+        <h4>3.18 Sono e Fadiga</h4>
+        <p>Sono ao volante triplica risco de acidente fatal. Sintomas: bocejos, peso nas pálpebras, dificuldade de manter velocidade constante, "apagar" por segundos (microssonos).</p>
+        <p><b>Em viagem longa:</b> pare a cada 2 horas; durma 7-8 h antes; evite refeições pesadas; nunca confie em café/energético como solução.</p>
+
+        <h4>3.19 Celular ao Volante</h4>
+        <p>Tirar a atenção 2 segundos a 60 km/h = ~33 m no escuro. Risco de colisão até <b>4x maior</b>. Mesmo com viva-voz, a atenção cognitiva fica comprometida.</p>
+
+        <h4>3.20 Em Caso de Pane</h4>
+        <ul>
+          <li>Ligue o <b>pisca-alerta</b> imediatamente</li>
+          <li>Desloque-se para o <b>acostamento</b></li>
+          <li>Posicione o <b>triângulo</b> a distância adequada (~30 passos em rodovia)</li>
+          <li>Saia do veículo pelo lado oposto ao do tráfego</li>
+          <li>Aguarde socorro fora da pista, atrás da barreira ou em local seguro</li>
+        </ul>
+
+        <h4>3.21 Estacionamento em Aclive/Declive</h4>
+        <ul>
+          <li><b>Aclive com meio-fio:</b> rodas para FORA do meio-fio</li>
+          <li><b>Aclive sem meio-fio:</b> rodas viradas para o meio-fio (acostamento)</li>
+          <li><b>Declive (com ou sem meio-fio):</b> rodas para o meio-fio</li>
+          <li>Sempre engatar marcha (1ª no aclive, ré no declive) + freio de mão</li>
+        </ul>
+
+        <div class="callout"><strong>💡 Princípio-chave:</strong> Direção defensiva não é dirigir devagar, é dirigir <b>antecipando o erro do outro</b>.</div>
+
+        <div class="deeper">
+          <div class="deeper-title">🔗 Links para aprofundar</div>
+          <ul>
+            <li><a href="https://www.detran.pr.gov.br/arquivos/File/habilitacao/apostilas/direcaodefensiva.pdf" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Cartilha DENATRAN — Direção Defensiva</span><span class="desc">PDF completo (62 páginas)</span></span></a></li>
+            <li><a href="https://www.detran.sp.gov.br/wps/wcm/connect/portaldetran/detran/sa-educacao/sa-apostilas+denatran/60390cc3-de1f-42b5-a8f4-0c2ad21287cb" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Apostilas DENATRAN (DETRAN-SP)</span><span class="desc">Materiais educativos oficiais</span></span></a></li>
+            <li><a href="https://www.detraneduca.pr.gov.br/Pagina/Materiais-Educativos" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">DETRAN Educa</span><span class="desc">Vídeos e cartilhas de educação para o trânsito</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TÓPICO 4: PRIMEIROS SOCORROS ========== -->
+    <div class="topic" data-topic>
+      <div class="topic-head">
+        <h3><span class="topic-icon t4">🚑</span> Primeiros Socorros</h3>
+        <span class="chevron">›</span>
+      </div>
+      <div class="topic-body">
+
+        <h4>4.1 O Que É</h4>
+        <p>Atendimento <b>imediato</b> e <b>provisório</b> a vítima de acidente ou mal súbito, até a chegada do socorro especializado. <b>Deixar de prestar socorro é crime</b> (Art. 304 CTB) — detenção 6 meses a 1 ano.</p>
+
+        <h4>4.2 Sistema PAS</h4>
+        <ul>
+          <li><b>P — PROTEGER:</b> sinalize o local (triângulo, pisca-alerta), desligue motores, evite curiosos</li>
+          <li><b>A — AVISAR:</b> acione socorro (192/193) com informações claras</li>
+          <li><b>S — SOCORRER:</b> apenas o que estiver dentro de sua capacidade; nunca além do que sabe fazer</li>
+        </ul>
+
+        <h4>4.3 Telefones de Emergência</h4>
+        <ul>
+          <li><b>192</b> — SAMU (Serviço de Atendimento Móvel de Urgência)</li>
+          <li><b>193</b> — Corpo de Bombeiros</li>
+          <li><b>190</b> — Polícia Militar</li>
+          <li><b>191</b> — PRF (Polícia Rodoviária Federal)</li>
+          <li><b>199</b> — Defesa Civil</li>
+        </ul>
+
+        <h4>4.4 O Que Falar ao Operador</h4>
+        <ul>
+          <li>Local exato (endereço, ponto de referência, km da rodovia)</li>
+          <li>Quantas vítimas e estado aparente (consciente, sangrando, presa nas ferragens)</li>
+          <li>Tipo de acidente (atropelamento, capotamento, colisão)</li>
+          <li>Riscos no local (fogo, vazamento, fios elétricos)</li>
+          <li>Seu nome e telefone para contato</li>
+          <li><b>Não desligue</b> antes do operador autorizar</li>
+        </ul>
+
+        <h4>4.5 Avaliação Primária — ABC</h4>
+        <ul>
+          <li><b>A — Airway (Vias Aéreas):</b> verifique se está respirando; remova objetos da boca; se inconsciente sem suspeita de trauma cervical, incline levemente a cabeça para trás</li>
+          <li><b>B — Breathing (Respiração):</b> veja, ouça, sinta. Se não respira: iniciar RCP</li>
+          <li><b>C — Circulation (Circulação):</b> verifique pulso (carotídeo). Hemorragia grave? Comprimir o ponto.</li>
+        </ul>
+
+        <h4>4.6 Sinais Vitais Normais (Adulto)</h4>
+        <ul>
+          <li><b>Pulso:</b> 60-100 batimentos por minuto</li>
+          <li><b>Respiração:</b> 12-20 movimentos respiratórios por minuto</li>
+          <li><b>Temperatura corporal:</b> 36-37,5 °C</li>
+          <li><b>Pressão arterial:</b> ~120/80 mmHg</li>
+        </ul>
+
+        <h4>4.7 Estado de Consciência (AVDI)</h4>
+        <ul>
+          <li><b>A</b> — Alerta</li>
+          <li><b>V</b> — responde a estímulo Verbal</li>
+          <li><b>D</b> — responde a estímulo Doloroso</li>
+          <li><b>I</b> — Inconsciente / não responsivo</li>
+        </ul>
+
+        <h4>4.8 Reanimação Cardiopulmonar (RCP) — Adulto</h4>
+        <p>Para vítima sem respiração e sem pulso:</p>
+        <ul>
+          <li>Deite a vítima de costas em superfície firme</li>
+          <li>Posicione as mãos no <b>centro do tórax</b> (entre os mamilos)</li>
+          <li>Compressões: <b>5 a 6 cm de profundidade</b>, ritmo de <b>100 a 120/min</b></li>
+          <li>Se treinado: 30 compressões + 2 ventilações boca-a-boca; senão, só compressões contínuas</li>
+          <li>Não pare até chegada do socorro ou recuperação da vítima</li>
+          <li>Cada minuto sem RCP reduz a sobrevida em ~10%</li>
+        </ul>
+
+        <h4>4.9 Hemorragias</h4>
+        <p><b>Externa:</b></p>
+        <ul>
+          <li>Comprima diretamente o local com <b>pano limpo</b> e mantenha pressão</li>
+          <li>Eleve o membro afetado (se sem fratura)</li>
+          <li>Se atravessar o pano, <b>não retire</b> — coloque outro por cima</li>
+          <li>Torniquete: <b>último recurso</b>, e apenas por profissional (risco de necrose)</li>
+        </ul>
+        <p><b>Tipos pela origem do sangue:</b></p>
+        <ul>
+          <li><b>Arterial</b> — vermelho-vivo, em jatos pulsáteis (mais grave)</li>
+          <li><b>Venoso</b> — vermelho-escuro, fluxo contínuo</li>
+          <li><b>Capilar</b> — pequenos vasos, sangue oozing</li>
+        </ul>
+        <p><b>Nasal:</b> incline a cabeça <b>para frente</b> (não para trás), pince a parte mole do nariz por 10 minutos.</p>
+
+        <h4>4.10 Estado de Choque</h4>
+        <p>Falta de oxigenação adequada dos órgãos por queda de pressão (hemorragia, desidratação, dor intensa).</p>
+        <p><b>Sinais:</b> palidez, pele fria e suada, pulso fraco e rápido, respiração curta, ansiedade, confusão mental.</p>
+        <p><b>O que fazer:</b> deitar a vítima, <b>elevar as pernas</b> ~30 cm, afrouxar roupas, cobrir para conservar calor. Chame socorro. NÃO dar água ou comida.</p>
+
+        <h4>4.11 Vítima Inconsciente</h4>
+        <ul>
+          <li>Verifique respiração</li>
+          <li>Em <b>caso de acidente</b>, NÃO movimente (risco de lesão na coluna). Só remova em risco iminente (fogo, explosão)</li>
+          <li>Se respira normalmente e sem trauma, considere posição lateral de segurança (PLS)</li>
+          <li>Chame socorro imediatamente</li>
+        </ul>
+
+        <h4>4.12 Suspeita de Lesão na Coluna</h4>
+        <p><b>Sinais:</b> formigamento, perda de sensibilidade, não consegue mover membros, dor intensa nas costas/pescoço.</p>
+        <p><b>Regra de ouro:</b> <b>NÃO MOVA</b> a vítima. Estabilize o pescoço (cabeça alinhada com o tronco) e aguarde resgate especializado. Movimento errado pode causar <b>paralisia permanente</b>.</p>
+
+        <h4>4.13 Capacete em Motociclista</h4>
+        <p><b>NÃO retire o capacete.</b> Apenas profissionais treinados (com duas pessoas) podem remover com segurança. Tirar errado pode causar lesão medular irreversível.</p>
+
+        <h4>4.14 Fraturas e Luxações</h4>
+        <ul>
+          <li>Imobilize o membro <b>na posição em que se encontra</b> (não tente "encaixar")</li>
+          <li>Use talas improvisadas (pedaços de madeira, jornal enrolado)</li>
+          <li>Apoie acima e abaixo do local da fratura</li>
+          <li>Fratura exposta: cubra com pano limpo, não retire fragmentos ósseos</li>
+        </ul>
+
+        <h4>4.15 Queimaduras</h4>
+        <p><b>Graus:</b></p>
+        <ul>
+          <li><b>1º grau:</b> só vermelhidão (epiderme)</li>
+          <li><b>2º grau:</b> bolhas (atinge a derme)</li>
+          <li><b>3º grau:</b> tecido carbonizado (atinge músculo/osso)</li>
+        </ul>
+        <p><b>O que fazer:</b> resfriar com <b>água corrente fria</b> por 10-15 min; cobrir com pano limpo e úmido; encaminhar ao hospital.</p>
+        <p><b>NUNCA:</b></p>
+        <ul>
+          <li>Furar bolhas</li>
+          <li>Passar manteiga, pasta de dente, óleo, pomada caseira</li>
+          <li>Tentar retirar roupa grudada na pele</li>
+          <li>Usar gelo direto (causa mais lesão)</li>
+        </ul>
+
+        <h4>4.16 Choque Elétrico</h4>
+        <p><b>Antes de tocar a vítima, DESLIGUE a fonte de energia.</b> Caso contrário, você também receberá o choque. Se não puder desligar, use material isolante (madeira seca, borracha) para afastar a vítima do fio.</p>
+
+        <h4>4.17 Engasgo (Obstrução de Vias Aéreas) — Adulto</h4>
+        <p><b>Manobra de Heimlich:</b></p>
+        <ul>
+          <li>Posicione-se atrás da vítima</li>
+          <li>Abrace-a passando os braços pela cintura</li>
+          <li>Cerre uma das mãos em punho, posicione acima do umbigo (abaixo do esterno)</li>
+          <li>Aplique compressões rápidas para dentro e para cima até desobstruir</li>
+        </ul>
+
+        <h4>4.18 Convulsões</h4>
+        <ul>
+          <li>Afaste objetos que possam machucar</li>
+          <li>Proteja a cabeça (almofada, agasalho)</li>
+          <li><b>NÃO</b> coloque nada na boca (não morde a língua, é mito)</li>
+          <li>NÃO segure o corpo (pode causar fraturas)</li>
+          <li>Após o episódio, vire em PLS</li>
+        </ul>
+
+        <h4>4.19 Desmaio Simples</h4>
+        <ul>
+          <li>Deite a vítima de costas</li>
+          <li>Eleve as pernas ~30 cm</li>
+          <li>Afrouxe roupas apertadas</li>
+          <li>Ventile o ambiente</li>
+          <li>Se não recuperar em 1-2 min, chame socorro</li>
+        </ul>
+
+        <h4>4.20 Incêndio no Veículo</h4>
+        <ul>
+          <li>Pare em local seguro o mais rápido possível</li>
+          <li>Desligue a ignição (corta combustível)</li>
+          <li>Saia do veículo e afaste-se</li>
+          <li>Acione bombeiros (193)</li>
+          <li>Só tente apagar se for foco pequeno e tiver extintor adequado</li>
+        </ul>
+
+        <div class="callout"><strong>🛑 Lista do que NUNCA fazer:</strong>
+          Dar água/comida; mexer vítima com suspeita de trauma; retirar capacete; furar bolha de queimadura; aplicar torniquete sem necessidade; mover vítima inconsciente sem risco iminente; remover objeto encravado em ferimento.
+        </div>
+
+        <div class="deeper">
+          <div class="deeper-title">🔗 Links para aprofundar</div>
+          <ul>
+            <li><a href="https://www.detran.pr.gov.br/arquivos/File/habilitacao/apostilas/primeirossocorros.pdf" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Cartilha DENATRAN — Primeiros Socorros</span><span class="desc">PDF oficial sobre socorros em acidentes</span></span></a></li>
+            <li><a href="https://escola.detran.rs.gov.br/wp-content/uploads/2022/11/primeiros_socorros.pdf" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Caderno do Estudante — DETRAN-RS</span><span class="desc">Material didático completo</span></span></a></li>
+            <li><a href="https://www.gov.br/saude/pt-br/composicao/saes/dahu/samu-192" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">SAMU 192 — Ministério da Saúde</span><span class="desc">Como acionar e o que informar</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TÓPICO 5: MECÂNICA BÁSICA ========== -->
+    <div class="topic" data-topic>
+      <div class="topic-head">
+        <h3><span class="topic-icon t5">🔧</span> Mecânica Básica e Manutenção</h3>
+        <span class="chevron">›</span>
+      </div>
+      <div class="topic-body">
+
+        <h4>5.1 Principais Sistemas do Veículo</h4>
+        <ul>
+          <li><b>Motor</b> — converte combustível em energia mecânica</li>
+          <li><b>Transmissão</b> — câmbio + embreagem; transmite força às rodas</li>
+          <li><b>Direção</b> — comanda rumo (hidráulica/elétrica/mecânica)</li>
+          <li><b>Freios</b> — a disco (dianteiros), a tambor (traseiros), ABS, EBD</li>
+          <li><b>Suspensão</b> — amortecedores e molas; absorve impactos</li>
+          <li><b>Elétrico</b> — bateria, alternador, motor de partida, iluminação</li>
+          <li><b>Alimentação</b> — tanque, bomba, injeção (ou carburador)</li>
+          <li><b>Arrefecimento</b> — radiador + líquido de arrefecimento; controla temperatura do motor</li>
+          <li><b>Lubrificação</b> — óleo do motor; reduz atrito e desgaste</li>
+          <li><b>Escape</b> — coletor, catalisador, silencioso</li>
+        </ul>
+
+        <h4>5.2 Luzes do Painel — Por Cor</h4>
+        <p><b>VERMELHO</b> = perigo imediato; pare assim que possível.</p>
+        <ul>
+          <li>⛽ Óleo do motor — pressão baixa; pode fundir o motor</li>
+          <li>🌡️ Temperatura — motor superaquecendo</li>
+          <li>🔋 Bateria — alternador não está carregando</li>
+          <li>🅿️ Freio de mão acionado / fluido de freio baixo</li>
+          <li>👤 Cinto de segurança não afivelado</li>
+          <li>💨 Airbag com falha</li>
+        </ul>
+        <p><b>AMARELO / LARANJA</b> = atenção; problema a verificar logo.</p>
+        <ul>
+          <li>🔧 Injeção eletrônica / luz do motor ("check engine")</li>
+          <li>⛽ Reserva de combustível</li>
+          <li>🛞 ABS com falha</li>
+          <li>🔥 Pré-aquecimento (diesel)</li>
+          <li>💧 Filtro de partículas / Adblue</li>
+        </ul>
+        <p><b>VERDE / AZUL</b> = informativo, em uso.</p>
+        <ul>
+          <li>↗️ Setas direcionais</li>
+          <li>💡 Farol baixo (verde) / farol alto (azul)</li>
+          <li>🌫️ Faróis de neblina</li>
+        </ul>
+
+        <h4>5.3 O Que Verificar no Veículo</h4>
+        <p><b>Diariamente (antes de sair):</b></p>
+        <ul>
+          <li>Faróis, lanternas, setas, luz de freio</li>
+          <li>Pneus (visualmente — pressão e desgaste)</li>
+          <li>Espelhos e para-brisa</li>
+        </ul>
+        <p><b>Semanalmente:</b></p>
+        <ul>
+          <li>Nível de óleo do motor (motor frio, em piso plano)</li>
+          <li>Nível do líquido de arrefecimento (no reservatório, motor frio)</li>
+          <li>Nível do fluido de freio</li>
+          <li>Nível da água do limpador de para-brisa</li>
+          <li>Pressão dos pneus (incluindo estepe)</li>
+        </ul>
+        <p><b>Mensalmente:</b></p>
+        <ul>
+          <li>Limpeza do filtro de ar</li>
+          <li>Verificação de luzes pequenas (placa, ré, freio)</li>
+        </ul>
+        <p><b>Periódica (revisão programada):</b></p>
+        <ul>
+          <li>Troca de óleo e filtros</li>
+          <li>Correia dentada</li>
+          <li>Pastilhas e discos de freio</li>
+          <li>Alinhamento e balanceamento</li>
+          <li>Velas, cabos de vela</li>
+          <li>Suspensão</li>
+        </ul>
+
+        <h4>5.4 Pneus</h4>
+        <ul>
+          <li><b>Profundidade mínima:</b> <b>1,6 mm</b> (legal). Abaixo disso, troca obrigatória.</li>
+          <li><b>Indicador TWI:</b> pequena saliência no fundo do sulco; se nivelar com a banda, pneu careca.</li>
+          <li><b>Calibragem:</b> conforme manual do veículo, geralmente entre 28 e 36 psi. Verifique com pneu frio.</li>
+          <li><b>Pneu murcho:</b> aumenta consumo, desgasta lateral, esquenta e pode estourar.</li>
+          <li><b>Pneu cheio demais:</b> desgasta centro, perde aderência, conforto reduzido.</li>
+          <li><b>Rodízio:</b> a cada 10.000 km, prolonga vida.</li>
+          <li><b>Balanceamento e alinhamento:</b> a cada troca ou se sentir trepidação/volante puxando.</li>
+        </ul>
+
+        <h4>5.5 Sistema de Freios</h4>
+        <ul>
+          <li><b>Pedal mole/baixo:</b> ar no sistema, vazamento, pastilhas no fim</li>
+          <li><b>Veículo puxando para um lado ao frear:</b> pinça travada ou pastilhas desiguais</li>
+          <li><b>Trepidação ao frear:</b> disco empenado</li>
+          <li><b>Barulho metálico:</b> pastilha no limite (encostando no disco)</li>
+          <li><b>ABS:</b> impede travamento das rodas em frenagem brusca — você sente o pedal vibrar, é normal, <b>continue pisando firme</b></li>
+        </ul>
+
+        <h4>5.6 Como Trocar um Pneu</h4>
+        <ul>
+          <li>Pare em local plano e seguro; ligue pisca-alerta; ponha triângulo</li>
+          <li>Calce a roda diagonalmente oposta</li>
+          <li>Afrouxe os parafusos (sem retirar) com o veículo no chão</li>
+          <li>Posicione o macaco no ponto correto do chassi (consulte manual)</li>
+          <li>Levante o veículo até a roda sair do chão</li>
+          <li>Retire parafusos e troque pelo estepe</li>
+          <li>Aperte parafusos em <b>cruz</b>, não em sequência</li>
+          <li>Abaixe o veículo e dê o aperto final</li>
+        </ul>
+
+        <h4>5.7 Motor Superaqueceu, e Agora?</h4>
+        <ul>
+          <li>Pare em local seguro</li>
+          <li>Desligue o motor</li>
+          <li><b>NUNCA</b> abra o reservatório ou radiador quente — risco de queimadura grave por jato de vapor</li>
+          <li>Aguarde resfriar (30+ min) antes de checar o nível</li>
+          <li>Se faltar líquido, complete com água até chegar ao mecânico (cuidado para identificar vazamento)</li>
+        </ul>
+
+        <h4>5.8 Combustíveis</h4>
+        <ul>
+          <li><b>Gasolina</b> — alta octanagem, ignição por vela</li>
+          <li><b>Etanol</b> — combustível renovável, menos emissão de CO2; consumo ~30% maior</li>
+          <li><b>Diesel</b> — usado em caminhões e SUVs; ignição por compressão; uso vetado em carros de passeio</li>
+          <li><b>GNV</b> — gás natural veicular; conversão regulamentada</li>
+          <li><b>Híbridos e elétricos</b> — em crescimento; menor emissão</li>
+        </ul>
+
+        <h4>5.9 Itens Obrigatórios Resumidos</h4>
+        <ul>
+          <li>Cinto de segurança para todos</li>
+          <li>Encosto de cabeça em todos os bancos com cinto</li>
+          <li>Estepe + macaco + chave de roda</li>
+          <li>Triângulo de sinalização</li>
+          <li>Espelhos retrovisores (interno + 2 externos)</li>
+          <li>Limpador e lavador de para-brisa</li>
+          <li>Buzina (volume regulamentar, sem cornetas)</li>
+          <li>Velocímetro e hodômetro funcionando</li>
+          <li>Pneus em condição (≥ 1,6 mm)</li>
+          <li>Iluminação completa (faróis, lanternas, freio, setas, ré, placa)</li>
+        </ul>
+
+        <div class="callout"><strong>🔍 Dica de prova:</strong> luz <b>vermelha</b> = pare; <b>amarela</b> = verifique logo; <b>verde/azul</b> = informativo. Essa relação cai sempre.</div>
+
+        <div class="deeper">
+          <div class="deeper-title">🔗 Links para aprofundar</div>
+          <ul>
+            <li><a href="https://www.detraneduca.pr.gov.br/Pagina/Materiais-Educativos" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Materiais Educativos DETRAN-PR</span><span class="desc">Cartilhas sobre veículo e manutenção</span></span></a></li>
+            <li><a href="https://www.gov.br/transportes/pt-br/assuntos/transito/senatran/educacao-para-o-transito" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">SENATRAN — Educação para o Trânsito</span><span class="desc">Conteúdos oficiais sobre veículos e segurança</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TÓPICO 6: MEIO AMBIENTE E CIDADANIA ========== -->
+    <div class="topic" data-topic>
+      <div class="topic-head">
+        <h3><span class="topic-icon t6">🌱</span> Meio Ambiente e Cidadania no Trânsito</h3>
+        <span class="chevron">›</span>
+      </div>
+      <div class="topic-body">
+
+        <h4>6.1 Tipos de Poluição Veicular</h4>
+        <ul>
+          <li><b>Atmosférica</b> — emissão de gases (CO, NOx, HC, CO2, material particulado)</li>
+          <li><b>Sonora</b> — buzinas, escapamentos modificados, motores barulhentos</li>
+          <li><b>Visual</b> — adesivos, propaganda excessiva, sucata</li>
+        </ul>
+
+        <h4>6.2 Principais Gases Poluentes</h4>
+        <ul>
+          <li><b>CO (monóxido de carbono)</b> — gás <b>incolor, inodoro e letal</b>. Reduz oxigenação do sangue. Nunca aqueça o motor em garagem fechada.</li>
+          <li><b>NOx (óxidos de nitrogênio)</b> — causam chuva ácida e problemas respiratórios</li>
+          <li><b>HC (hidrocarbonetos)</b> — contribuem para formação de ozônio troposférico</li>
+          <li><b>CO2 (dióxido de carbono)</b> — gás de efeito estufa, aquecimento global</li>
+          <li><b>MP (material particulado)</b> — fuligem, dano respiratório direto</li>
+        </ul>
+
+        <h4>6.3 Catalisador e PROCONVE</h4>
+        <p>O <b>catalisador</b> é um equipamento no escapamento que converte gases tóxicos (CO, NOx, HC) em CO2, N2 e vapor d'água. É <b>obrigatório</b> em veículos brasileiros desde 1992.</p>
+        <p>O <b>PROCONVE</b> (Programa de Controle da Poluição do Ar por Veículos Automotores) regulamenta limites de emissão para fabricantes desde 1986.</p>
+
+        <h4>6.4 Direção Econômica e Ecológica</h4>
+        <ul>
+          <li>Mantenha velocidade constante (evite acelerações e freadas bruscas)</li>
+          <li>Use a marcha correta (não force em marchas baixas)</li>
+          <li>Desligue o motor em paradas longas (acima de 1 min)</li>
+          <li>Calibre os pneus regularmente (pneu murcho consome até 5% mais)</li>
+          <li>Não excesso de peso desnecessário no porta-malas</li>
+          <li>Faça revisões em dia (motor regulado polui menos)</li>
+          <li>Bagageiro no teto aumenta consumo (resistência aerodinâmica)</li>
+          <li>Ar-condicionado consome ~10% mais, mas em alta velocidade janelas abertas consomem ainda mais</li>
+        </ul>
+
+        <h4>6.5 Inspeção Ambiental</h4>
+        <p>Algumas cidades exigem inspeção periódica das emissões. Veículos reprovados devem ser regulados em oficina e reinspecionados. No futuro, sistemas de medição embarcada (OBD) podem indicar falhas direto pela "luz do motor".</p>
+
+        <h4>6.6 Cidadania no Trânsito</h4>
+        <p>O trânsito é um espaço público. Ser cidadão no trânsito é:</p>
+        <ul>
+          <li>Respeitar todos os usuários (motoristas, motociclistas, ciclistas, pedestres)</li>
+          <li>Não disputar espaço — compartilhar</li>
+          <li>Dar preferência a quem é mais vulnerável (pedestre, idoso, criança, PcD)</li>
+          <li>Não buzinar agressivamente; buzina é alerta de segurança, não comunicação</li>
+          <li>Não estacionar em vagas reservadas (idoso, gestante, PcD) sem direito</li>
+          <li>Não jogar lixo pela janela (infração média)</li>
+          <li>Manter calma; trânsito não é competição</li>
+        </ul>
+
+        <h4>6.7 Direitos do Pedestre</h4>
+        <ul>
+          <li>Preferência absoluta em faixa de pedestres (Art. 214 CTB)</li>
+          <li>Preferência ao terminar travessia mesmo se o sinal mudar para o veículo</li>
+          <li>Direito a calçadas e passeios desimpedidos</li>
+          <li>Cruzar via na faixa, perpendicular ao eixo</li>
+        </ul>
+
+        <h4>6.8 Ciclistas</h4>
+        <ul>
+          <li>Têm direito à via (Art. 58 CTB)</li>
+          <li>Distância lateral mínima de <b>1,5 m</b> ao ultrapassar (Art. 201)</li>
+          <li>Ciclofaixa: pintada na via</li>
+          <li>Ciclovia: separada fisicamente</li>
+          <li>Equipamentos obrigatórios do ciclista: capacete, refletivos noturnos, campainha, espelho esquerdo</li>
+        </ul>
+
+        <h4>6.9 Vagas Especiais</h4>
+        <p>Estacionar irregularmente em vagas reservadas é <b>infração grave</b>:</p>
+        <ul>
+          <li>Vagas para <b>PcD</b> (Pessoa com Deficiência) — credencial obrigatória</li>
+          <li>Vagas para <b>idosos</b> (60+) — credencial obrigatória</li>
+          <li>Vagas para <b>gestantes</b> — disponibilidade por aviso/credencial em algumas cidades</li>
+        </ul>
+
+        <h4>6.10 Princípios do CTB sobre o Trânsito</h4>
+        <p><b>Art. 1º, §§ 2º e 3º:</b></p>
+        <ul>
+          <li>"O trânsito, em condições seguras, é um <b>direito de todos</b> e dever dos órgãos…"</li>
+          <li>"Os órgãos e entidades… respondem objetivamente por <b>danos causados aos cidadãos</b> em virtude de ação, omissão ou erro…"</li>
+        </ul>
+        <p>O conceito-chave: <b>vida e integridade física valem mais que tempo ou velocidade</b>.</p>
+
+        <div class="callout"><strong>🌍 Reflexão:</strong> dirigir é uma atividade <b>social</b>. Cada gesto seu no trânsito afeta dezenas de pessoas. Conduzir bem é um ato de cidadania.</div>
+
+        <div class="deeper">
+          <div class="deeper-title">🔗 Links para aprofundar</div>
+          <ul>
+            <li><a href="https://www.gov.br/ibama/pt-br/assuntos/emissoes-e-residuos/emissoes/programa-de-controle-de-emissoes-veiculares-proconve" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">PROCONVE — IBAMA</span><span class="desc">Programa de controle de emissões veiculares</span></span></a></li>
+            <li><a href="https://www.gov.br/ibama/pt-br/assuntos/noticias/2026/pioneiro-na-america-latina-programa-de-controle-da-poluicao-veicular-completa-40-anos" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">40 anos do PROCONVE</span><span class="desc">Notícia do IBAMA — impacto e resultados</span></span></a></li>
+            <li><a href="https://www.planalto.gov.br/ccivil_03/leis/l9503compilado.htm#cap6" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">CTB Capítulo VI — Trânsito Sustentável</span><span class="desc">Veículos e meio ambiente no CTB</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TÓPICO 7: DICAS PARA A PROVA ========== -->
+    <div class="topic" data-topic>
+      <div class="topic-head">
+        <h3><span class="topic-icon t1">🎯</span> Dicas para o dia da prova</h3>
+        <span class="chevron">›</span>
+      </div>
+      <div class="topic-body">
+
+        <h4>7.1 Como Funciona a Prova Teórica em MG (Regra Atual 2026)</h4>
+        <p>A <b>Resolução 1020/2025 do CONTRAN</b> (em vigor desde dez/2025, programa "CNH do Brasil") mudou várias regras. O modelo atual:</p>
+        <ul>
+          <li><b>30 questões</b> de múltipla escolha (4 alternativas)</li>
+          <li>Tempo: <b>60 minutos</b> (era 40)</li>
+          <li>Aprovação: <b>20 acertos</b> — cerca de <b>67%</b> (era 21 / 70%)</li>
+          <li>Candidatos com dislexia, TDAH ou TEA têm o <b>dobro do tempo</b></li>
+          <li>Banco Nacional de Questões da <b>SENATRAN</b> — o mesmo em todos os estados</li>
+          <li>Realizada em CFC ou no DETRAN, em computador</li>
+          <li>Resultado sai na hora</li>
+        </ul>
+        <p><b>Outras mudanças relevantes:</b></p>
+        <ul>
+          <li>O <b>curso teórico</b> agora é gratuito e pode ser feito 100% online pelo aplicativo <b>CNH do Brasil</b> (do Governo Federal)</li>
+          <li>A autoescola virou <b>opcional</b> para essa etapa — não há mais carga horária obrigatória de 45h</li>
+          <li>Custo total da habilitação caiu (estimativa entre R$ 700 e R$ 1.000)</li>
+          <li>Prova prática agora permite até <b>10 pontos negativos</b> (era 3)</li>
+        </ul>
+
+        <h4>7.2 Distribuição Típica das Questões</h4>
+        <ul>
+          <li>~12 questões — <b>Legislação de Trânsito</b></li>
+          <li>~10 questões — <b>Direção Defensiva</b></li>
+          <li>~3 questões — <b>Primeiros Socorros</b></li>
+          <li>~3 questões — <b>Mecânica Básica</b></li>
+          <li>~2 questões — <b>Cidadania/Meio Ambiente</b></li>
+        </ul>
+
+        <h4>7.3 O Que Levar</h4>
+        <ul>
+          <li><b>Documento de identidade original</b> (RG, CNH, passaporte) — sem ele, você não faz a prova</li>
+          <li>Comprovante de agendamento</li>
+          <li>Cabeça descansada (durma bem na noite anterior)</li>
+        </ul>
+
+        <h4>7.4 Estratégia Durante a Prova</h4>
+        <ul>
+          <li>Leia a questão com calma — o erro mais comum é responder rápido sem ler tudo</li>
+          <li>Atenção a palavras como <b>"NÃO", "EXCETO", "INCORRETO"</b></li>
+          <li>Elimine alternativas absurdas primeiro</li>
+          <li>Em caso de dúvida entre duas, vá na primeira intuição</li>
+          <li>Não deixe questões em branco; chute fundamentado</li>
+          <li>Marque difíceis para revisar e volte depois</li>
+          <li>Gerencie tempo: ~1 min por questão</li>
+          <li>Revise antes de finalizar (você pode marcar e voltar)</li>
+        </ul>
+
+        <h4>7.5 Estratégia de Estudo (cronograma sugerido)</h4>
+        <ul>
+          <li><b>Semana 1:</b> ler toda a apostila 1 vez. Foco em conceitos.</li>
+          <li><b>Semana 2:</b> reler legislação e direção defensiva (são 22 das 30 questões!). Fazer simulados FÁCIL até acertar 90%.</li>
+          <li><b>Semana 3:</b> simulados MÉDIO até 80%. Revisar erros.</li>
+          <li><b>Véspera:</b> simulado DIFÍCIL e relaxar. Não estude na hora; descanse.</li>
+        </ul>
+
+        <h4>7.6 Erros Mais Comuns</h4>
+        <ul>
+          <li>Confundir as cores das placas (regulamentação x advertência)</li>
+          <li>Decorar artigo errado de classificação de infração</li>
+          <li>Achar que extintor é obrigatório em carro de passeio (não é mais)</li>
+          <li>Confundir vias urbanas (rápida 80 / arterial 60 / coletora 40 / local 30)</li>
+          <li>Esquecer que pedestre tem preferência na faixa</li>
+          <li>Errar quem tem preferência em cruzamento sem sinalização (quem vem pela <b>direita</b>)</li>
+          <li>Subestimar a quantidade de pontos de cada infração</li>
+        </ul>
+
+        <h4>7.7 Reprovou? E agora?</h4>
+        <ul>
+          <li>Em MG, geralmente é possível remarcar em poucos dias (após pagar nova taxa)</li>
+          <li>Faça uma análise objetiva: qual área errou mais?</li>
+          <li>Volte aos simulados focando nessa área até estabilizar acerto &gt; 80%</li>
+        </ul>
+
+        <div class="callout"><strong>🚗 Lembre:</strong> a prova teórica não testa só conhecimento — ela testa se você está pronto para <b>respeitar a vida</b> no trânsito. Estude com esse olhar e os acertos vêm naturalmente.</div>
+
+        <div class="deeper">
+          <div class="deeper-title">🔗 Links para aprofundar</div>
+          <ul>
+            <li><a href="https://www.detran.mg.gov.br/" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Portal DETRAN-MG</span><span class="desc">Agendamento da prova e serviços</span></span></a></li>
+            <li><a href="https://play.google.com/store/apps/details?id=br.gov.serpro.cnhe" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">App CNH do Brasil (Android)</span><span class="desc">Curso teórico gratuito do Governo Federal</span></span></a></li>
+            <li><a href="https://apps.apple.com/br/app/cnh-do-brasil/id1597985432" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">App CNH do Brasil (iOS)</span><span class="desc">Versão para iPhone</span></span></a></li>
+            <li><a href="https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-contran/resolucoes/resolucao-no-1020-de-29-de-outubro-de-2025.pdf" target="_blank" rel="noopener"><span class="arr">↗</span><span><span class="title">Resolução 1020/2025 (PDF)</span><span class="desc">Texto oficial das novas regras</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============== VIEW SIMULADO ============== -->
+  <div id="view-simulado" class="view">
+    <div id="simulado-home">
+      <div class="hero">
+        <h2>Escolha seu desafio</h2>
+        <p>Cada simulado tem 10 questões sorteadas aleatoriamente — nunca se repete a sequência.</p>
+      </div>
+
+      <div class="level-grid">
+        <button type="button" class="level facil" data-level="facil">
+          <div>
+            <h3>🟢 Fácil</h3>
+            <p>Conceitos básicos · ideal para começar</p>
+          </div>
+          <div class="level-arrow">→</div>
+        </button>
+        <button type="button" class="level medio" data-level="medio">
+          <div>
+            <h3>🟡 Médio</h3>
+            <p>Situações combinadas · nível da prova real</p>
+          </div>
+          <div class="level-arrow">→</div>
+        </button>
+        <button type="button" class="level dificil" data-level="dificil">
+          <div>
+            <h3>🔴 Difícil</h3>
+            <p>Artigos do CTB e detalhes técnicos</p>
+          </div>
+          <div class="level-arrow">→</div>
+        </button>
+      </div>
+    </div>
+
+    <div id="quiz-area" style="display:none"></div>
+    <div id="result-area" style="display:none"></div>
+  </div>
+
+  <!-- ============== VIEW PROGRESSO ============== -->
+  <div id="view-progresso" class="view">
+    <div class="hero">
+      <h2>Seu desempenho</h2>
+      <p>Acompanhe a evolução dos seus simulados.</p>
+      <div class="hero-stats" id="stats-summary">
+        <div class="stat-pill"><div class="num" id="stat-total">0</div><div class="lbl">Simulados</div></div>
+        <div class="stat-pill"><div class="num" id="stat-aprovado">0</div><div class="lbl">Aprovado</div></div>
+        <div class="stat-pill"><div class="num" id="stat-media">0%</div><div class="lbl">Média</div></div>
+      </div>
+    </div>
+
+    <div id="hist-list"></div>
+
+    <button class="btn ghost" id="btn-reset" style="margin-top:14px" onclick="resetHist()">Limpar histórico</button>
+  </div>
+
+</div>
+
+<div class="tabbar">
+  <button class="active" type="button" data-nav="estudar">
+    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Estudar
+  </button>
+  <button type="button" data-nav="simulado">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Simulado
+  </button>
+  <button type="button" data-nav="progresso">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Progresso
+  </button>
+</div>
+
+<script>
+/* ============================================
+   BANCO DE QUESTÕES — DETRAN MG
+   ============================================ */
+const BANCO = {
+  facil: [
+    {q:"Qual é a cor predominante das placas de regulamentação?", opts:["Amarela com preto","Branca com vermelho e preto","Azul com branco","Verde com branco"], correct:1, exp:"Placas de regulamentação têm fundo branco, orla vermelha e símbolos pretos. Indicam obrigações, proibições e restrições.", tema:"Sinalização"},
+    {q:"A placa octogonal vermelha com a palavra PARE significa:", opts:["Dê preferência","Parada obrigatória","Proibido estacionar","Velocidade máxima"], correct:1, exp:"R-1 (Parada Obrigatória): o condutor deve parar totalmente o veículo antes de prosseguir.", tema:"Sinalização"},
+    {q:"As placas de advertência têm que cor de fundo?", opts:["Branca","Vermelha","Amarela","Verde"], correct:2, exp:"Placas de advertência são amarelas com símbolos pretos, em forma de losango. Alertam sobre situações de risco na via.", tema:"Sinalização"},
+    {q:"O semáforo na cor amarela indica:", opts:["Pode acelerar","Atenção, sinal prestes a mudar","Pode passar normalmente","Inversão de mão"], correct:1, exp:"O amarelo significa atenção: o motorista deve parar, salvo se já estiver muito próximo do cruzamento (Art. 89 CTB).", tema:"Legislação"},
+    {q:"Quantos pontos uma infração GRAVÍSSIMA gera na CNH?", opts:["3 pontos","4 pontos","5 pontos","7 pontos"], correct:3, exp:"Infrações gravíssimas geram 7 pontos. Leves: 3; Médias: 4; Graves: 5 (Art. 259 do CTB).", tema:"Legislação"},
+    {q:"O uso do cinto de segurança é obrigatório para:", opts:["Apenas o motorista","Motorista e passageiro da frente","Todos os ocupantes do veículo","Apenas em rodovias"], correct:2, exp:"O cinto é obrigatório para todos os ocupantes, em qualquer via. Não usar = infração grave.", tema:"Legislação"},
+    {q:"Qual é a velocidade máxima padrão em vias locais urbanas, quando não sinalizadas?", opts:["30 km/h","40 km/h","60 km/h","80 km/h"], correct:0, exp:"Vias locais urbanas: 30 km/h. Coletoras: 40. Arteriais: 60. Rápidas urbanas: 80.", tema:"Legislação"},
+    {q:"Dirigir sob efeito de álcool é infração:", opts:["Leve","Média","Grave","Gravíssima"], correct:3, exp:"Art. 165 CTB: infração gravíssima, multa x10, suspensão da CNH por 12 meses, e pode haver detenção.", tema:"Legislação"},
+    {q:"O que significa a sigla CNH?", opts:["Cadastro Nacional de Habilitação","Carteira Nacional de Habilitação","Conselho Nacional de Habilitação","Central Nacional de Habilitação"], correct:1, exp:"CNH = Carteira Nacional de Habilitação, documento que comprova a autorização para dirigir.", tema:"Legislação"},
+    {q:"Qual a categoria da CNH para dirigir motocicleta?", opts:["A","B","C","D"], correct:0, exp:"Categoria A: motocicletas, motonetas e ciclomotores. B: carros de passeio. C: caminhões. D: ônibus.", tema:"Legislação"},
+    {q:"A placa amarela em formato de losango com curva acentuada é uma placa de:", opts:["Regulamentação","Advertência","Indicação","Educativa"], correct:1, exp:"Placas amarelas em losango são SEMPRE de advertência: alertam sobre condições adversas à frente.", tema:"Sinalização"},
+    {q:"Em uma colisão traseira, o principal culpado costuma ser:", opts:["O veículo da frente","O veículo de trás por não manter distância","Os dois igualmente","Depende da via"], correct:1, exp:"Quem bate na traseira presume-se culpado por não manter distância de seguimento.", tema:"Direção Defensiva"},
+    {q:"O principal item para prevenir colisão traseira é:", opts:["Buzinar antes","Manter distância segura do veículo da frente","Acelerar mais","Mudar de faixa sempre"], correct:1, exp:"A distância de seguimento permite reagir em emergências sem colidir.", tema:"Direção Defensiva"},
+    {q:"Em caso de acidente, a primeira atitude do condutor deve ser:", opts:["Sair do local rapidamente","Tirar fotos","Sinalizar a via e prestar socorro","Postar nas redes sociais"], correct:2, exp:"PAS: Proteger o local (sinalizar), Avisar (192/193), Socorrer. Deixar de socorrer é crime (Art. 304 CTB).", tema:"Primeiros Socorros"},
+    {q:"O número do SAMU é:", opts:["190","192","193","197"], correct:1, exp:"192 = SAMU. 193 = Bombeiros. 190 = Polícia Militar. 197 = Polícia Civil.", tema:"Primeiros Socorros"},
+    {q:"A profundidade mínima dos sulcos do pneu é:", opts:["0,8 mm","1,6 mm","3 mm","5 mm"], correct:1, exp:"Profundidade mínima legal: 1,6 mm. Abaixo disso, o pneu perde aderência (principalmente em piso molhado).", tema:"Mecânica"},
+    {q:"A luz vermelha no painel acesa indica:", opts:["Funcionamento normal","Alerta de manutenção futura","Problema grave - parar imediatamente","Bateria recarregando"], correct:2, exp:"Luzes vermelhas = perigo imediato (óleo, freio, temperatura, bateria). Pare assim que possível.", tema:"Mecânica"},
+    {q:"O extintor de incêndio para veículos de passeio é:", opts:["Obrigatório","Obrigatório apenas em rodovias","Não é mais obrigatório desde 2015","Obrigatório só à noite"], correct:2, exp:"Para automóveis de passeio o extintor deixou de ser obrigatório. Permanece para coletivos e transporte de produtos perigosos.", tema:"Mecânica"},
+    {q:"Para passar na prova teórica do DETRAN-MG, é preciso acertar no mínimo:", opts:["15 de 30 questões","18 de 30 questões","21 de 30 questões","25 de 30 questões"], correct:2, exp:"Mínimo de 21 acertos em 30 questões (70%) para aprovação.", tema:"Legislação"},
+    {q:"A sinalização vertical proibitiva mais comum tem a cor:", opts:["Verde","Vermelha","Azul","Marrom"], correct:1, exp:"Vermelho = proibição (placas de regulamentação). É a cor de maior urgência no trânsito.", tema:"Sinalização"},
+    {q:"Em rotatórias, a preferência é de quem:", opts:["Está entrando","Já está dentro da rotatória","Vier pela direita","Vier pela esquerda"], correct:1, exp:"Quem já está na rotatória tem preferência sobre quem está entrando.", tema:"Legislação"},
+    {q:"O que indica uma placa azul circular com seta?", opts:["Proibição","Sentido obrigatório","Atenção","Atrativo turístico"], correct:1, exp:"Placas azuis circulares com seta indicam sentido obrigatório (regulamentação por imposição).", tema:"Sinalização"},
+    {q:"Faixa de pedestres tem preferência:", opts:["Do veículo","Sempre do pedestre","Do mais rápido","Depende do horário"], correct:1, exp:"Pedestre TEM preferência na faixa. Não dar preferência = infração gravíssima (Art. 214 CTB).", tema:"Legislação"},
+    {q:"Buzinar em hospitais, escolas e à noite em área residencial é:", opts:["Permitido","Proibido","Recomendável","Obrigatório"], correct:1, exp:"Buzinar em horário/local proibido é infração média. A buzina serve apenas como advertência de segurança.", tema:"Legislação"},
+    {q:"O farol baixo deve ser usado:", opts:["Só à noite","Sempre, em qualquer situação","Em túneis e durante o dia em rodovias","Só com chuva"], correct:2, exp:"Obrigatório em túneis (dia e noite) e em rodovias durante o dia (Lei do Farol).", tema:"Legislação"},
+    {q:"Triângulo de sinalização deve ser colocado:", opts:["No próprio veículo","A uma distância adequada para ser visto a tempo","Sempre a 100m","Só atrás do veículo"], correct:1, exp:"Distância suficiente para que outros condutores percebam o obstáculo a tempo de reagir (em rodovias, ~30 passos).", tema:"Primeiros Socorros"},
+    {q:"O cinto de segurança deve ser usado:", opts:["Só em viagens longas","Só em rodovias","Sempre que estiver dirigindo ou for passageiro","Apenas pelo motorista"], correct:2, exp:"Sempre. Reduz mortes em até 45%. Obrigatório para TODOS os ocupantes.", tema:"Direção Defensiva"},
+    {q:"O que NÃO é um item obrigatório do veículo?", opts:["Estepe","Macaco","Triângulo de sinalização","Extintor para automóveis de passeio"], correct:3, exp:"Estepe, macaco, chave de roda e triângulo são obrigatórios. Extintor não é mais para automóveis de passeio.", tema:"Mecânica"},
+    {q:"Uma das principais causas de acidentes no trânsito brasileiro é:", opts:["Falha mecânica","Comportamento humano (imprudência, álcool, celular)","Mau tempo","Sinalização inadequada"], correct:1, exp:"Mais de 80% dos acidentes têm causa humana: imprudência, imperícia, negligência.", tema:"Direção Defensiva"},
+    {q:"Em via de mão dupla, ultrapassar pela direita é:", opts:["Permitido","Proibido em regra","Permitido só em rodovias","Permitido após acenar"], correct:1, exp:"Ultrapassagem pela direita é proibida (Art. 199 CTB), salvo quando o veículo da frente sinaliza conversão à esquerda.", tema:"Legislação"},
+    {q:"Direção defensiva é definida como:", opts:["Dirigir devagar","Dirigir prevendo riscos e evitando acidentes próprios e de terceiros","Dirigir só em vias seguras","Dirigir apenas durante o dia"], correct:1, exp:"É a prática de dirigir antecipando situações de risco para evitar acidentes, mesmo que outros errem.", tema:"Direção Defensiva"},
+    {q:"Em caso de chuva forte, a recomendação é:", opts:["Acelerar para passar logo","Reduzir velocidade e aumentar distância de seguimento","Ligar farol alto","Frear bruscamente"], correct:1, exp:"Chuva = pista escorregadia, aquaplanagem possível. Reduza velocidade, aumente distância e use farol baixo.", tema:"Direção Defensiva"},
+    {q:"A primeira atitude diante de uma vítima inconsciente é:", opts:["Dar água","Verificar se respira e chamar socorro","Movimentá-la para a calçada","Levantar a cabeça dela"], correct:1, exp:"Avaliar respiração e consciência, e acionar 192. NÃO movimentar (risco de lesão na coluna).", tema:"Primeiros Socorros"},
+    {q:"Em via urbana arterial, a velocidade máxima padrão é:", opts:["40 km/h","60 km/h","80 km/h","110 km/h"], correct:1, exp:"Arterial urbana: 60 km/h. A velocidade pode ser alterada por sinalização específica.", tema:"Legislação"},
+    {q:"O candidato à primeira CNH precisa ter no mínimo:", opts:["16 anos","17 anos","18 anos","21 anos"], correct:2, exp:"Idade mínima: 18 anos. Outros requisitos: saber ler/escrever, ter documento de identidade e CPF.", tema:"Legislação"},
+    {q:"Em ruas com semáforo desligado, vale a regra:", opts:["Quem vier pela esquerda tem preferência","Quem vier pela direita tem preferência","O maior veículo passa primeiro","Todos param"], correct:1, exp:"Em cruzamento sem sinalização, preferência para quem vem pela direita (Art. 29, III, 'c' do CTB).", tema:"Legislação"},
+    {q:"O nível de óleo do motor deve ser verificado:", opts:["Só na revisão","Periodicamente, com motor frio em local plano","Apenas quando a luz acender","A cada 2 anos"], correct:1, exp:"Verifique periodicamente, com motor frio e veículo em piso plano.", tema:"Mecânica"},
+    {q:"A poluição sonora no trânsito é causada principalmente por:", opts:["Faróis altos","Buzinas, motores e escapamentos irregulares","Limpadores de para-brisa","Pneus carecas"], correct:1, exp:"Buzinas em excesso, escapamentos modificados e motores sem manutenção são as principais fontes.", tema:"Meio Ambiente"},
+    {q:"Conduzir veículo sem habilitação é infração:", opts:["Leve","Média","Grave","Gravíssima"], correct:3, exp:"Art. 162 CTB: gravíssima, multa, e o veículo é retido.", tema:"Legislação"},
+    {q:"O cinto de segurança é eficaz porque:", opts:["Esquenta o motorista","Reduz o impacto, mantendo o ocupante no banco","Faz o veículo parar","Aumenta o conforto"], correct:1, exp:"Distribui o impacto pelas áreas mais resistentes do corpo e impede a projeção do ocupante.", tema:"Direção Defensiva"}
+  ],
+
+  medio: [
+    {q:"Quantos pontos um motorista pode acumular em 12 meses sem perder a CNH (sem nenhuma gravíssima)?", opts:["20 pontos","30 pontos","40 pontos","Não há limite"], correct:2, exp:"Lei 14.071/2020: 40 pts sem gravíssima; 30 com 1 gravíssima; 20 com 2 ou mais gravíssimas em 12 meses.", tema:"Legislação"},
+    {q:"O valor da multa por infração gravíssima padrão é:", opts:["R$ 88,38","R$ 130,16","R$ 195,23","R$ 293,47"], correct:3, exp:"Valores: Leve R$88,38 (3pts); Média R$130,16 (4pts); Grave R$195,23 (5pts); Gravíssima R$293,47 (7pts).", tema:"Legislação"},
+    {q:"Dirigir alcoolizado tem multa multiplicada por:", opts:["x3","x5","x10","Sem multiplicador"], correct:2, exp:"Art. 165 - álcool ao volante: multa multiplicada x10 (R$ 2.934,70) + suspensão da CNH por 12 meses.", tema:"Legislação"},
+    {q:"Em rodovia de pista simples, a velocidade máxima padrão para automóveis é:", opts:["80 km/h","100 km/h","110 km/h","120 km/h"], correct:1, exp:"Rodovia pista simples: 100 km/h carros; 90 ônibus/microônibus; 80 demais. Pista dupla: 110/90/80.", tema:"Legislação"},
+    {q:"Avançar o sinal vermelho do semáforo é infração:", opts:["Leve","Média","Grave","Gravíssima"], correct:3, exp:"Art. 208 CTB: gravíssima, 7 pontos, multa R$ 293,47. Risco altíssimo de colisão.", tema:"Legislação"},
+    {q:"Excesso de velocidade entre 20% e 50% acima do limite é infração:", opts:["Leve","Média","Grave","Gravíssima"], correct:2, exp:"Até 20%: média. Entre 20% e 50%: grave. Acima de 50%: gravíssima com multa x3 + suspensão.", tema:"Legislação"},
+    {q:"O sistema PAS em primeiros socorros significa:", opts:["Parar, Andar, Salvar","Proteger, Avisar, Socorrer","Pedir, Auxiliar, Sustentar","Perceber, Aguardar, Sair"], correct:1, exp:"P=Proteger (sinalizar o local), A=Avisar (acionar 192/193), S=Socorrer (prestar primeiros socorros).", tema:"Primeiros Socorros"},
+    {q:"Distância de seguimento ideal recomendada em segundos é:", opts:["1 segundo","2 segundos","3 segundos","5 segundos"], correct:1, exp:"Regra dos 2 segundos: tempo mínimo para reagir. Em chuva/à noite, aumente para 3 ou mais.", tema:"Direção Defensiva"},
+    {q:"Em caso de hemorragia externa, o procedimento correto é:", opts:["Aplicar torniquete sempre","Comprimir o local com pano limpo","Lavar com álcool","Dar água à vítima"], correct:1, exp:"Comprima o ferimento com pano limpo. Torniquete é último recurso e por profissional.", tema:"Primeiros Socorros"},
+    {q:"As condições adversas que afetam a direção são:", opts:["Apenas a via","Veículo, via, tempo, luz, trânsito e motorista","Apenas o motorista e o veículo","Apenas o tempo"], correct:1, exp:"São 6 condições adversas: Via, Tempo (clima), Trânsito, Luz, Veículo e Condutor (motorista).", tema:"Direção Defensiva"},
+    {q:"Em caso de pane mecânica em rodovia, o condutor deve:", opts:["Sair do veículo no meio da pista","Ligar o pisca-alerta e posicionar o triângulo","Empurrar o veículo até a próxima cidade","Ligar farol alto"], correct:1, exp:"Pisca-alerta + triângulo a distância adequada + retire-se para fora da pista esperando socorro.", tema:"Direção Defensiva"},
+    {q:"O que NÃO se deve fazer com vítima inconsciente em acidente?", opts:["Verificar respiração","Movimentá-la sem necessidade","Acionar socorro","Manter calma"], correct:1, exp:"NUNCA mova vítima inconsciente em acidente - risco de lesão na coluna. Só remova em risco iminente (fogo).", tema:"Primeiros Socorros"},
+    {q:"O capacete de um motociclista acidentado deve ser:", opts:["Retirado imediatamente","Mantido até a chegada de socorro especializado","Cortado","Trocado por outro"], correct:1, exp:"Não retire o capacete - movimento errado pode causar lesão medular irreversível.", tema:"Primeiros Socorros"},
+    {q:"Estacionar em local proibido por sinalização é infração:", opts:["Leve","Média","Grave","Gravíssima"], correct:1, exp:"Geralmente média (Art. 181). Em locais como faixa de pedestres ou em frente a hidrante, pode ser grave.", tema:"Legislação"},
+    {q:"Dirigir usando celular é infração:", opts:["Leve","Média","Grave","Gravíssima"], correct:3, exp:"Art. 252 § único: gravíssima, 7 pontos, multa R$ 293,47. Risco de colisão é até 4x maior.", tema:"Legislação"},
+    {q:"A função do amortecedor é:", opts:["Reduzir consumo de combustível","Absorver impactos e estabilizar o veículo","Aquecer o motor","Calibrar os pneus"], correct:1, exp:"Amortecedores absorvem irregularidades da pista, mantêm pneus em contato com solo e dão estabilidade.", tema:"Mecânica"},
+    {q:"A função do líquido de arrefecimento é:", opts:["Lubrificar o motor","Manter a temperatura ideal do motor","Limpar o motor","Acelerar a queima"], correct:1, exp:"Resfria o motor circulando pelo radiador. Sem ele, o motor superaquece e pode fundir.", tema:"Mecânica"},
+    {q:"Por norma, o sangue tem cor vermelho-vivo quando vem de:", opts:["Veias","Artérias","Capilares","Pulmões"], correct:1, exp:"Sangue arterial: vermelho-vivo, sai em jatos (perigoso). Venoso: vermelho-escuro, fluxo contínuo.", tema:"Primeiros Socorros"},
+    {q:"O catalisador no escapamento serve para:", opts:["Aumentar a potência","Reduzir emissão de gases poluentes","Diminuir o consumo","Reduzir ruído"], correct:1, exp:"O catalisador transforma gases tóxicos (CO, NOx, HC) em CO2 e vapor d'água. Item ambiental obrigatório.", tema:"Meio Ambiente"},
+    {q:"Em caso de queimadura, NÃO se deve:", opts:["Lavar com água corrente fria","Furar bolhas","Cobrir com pano limpo","Encaminhar para atendimento"], correct:1, exp:"NUNCA fure bolhas, não passe pasta de dente/manteiga. Resfrie com água corrente e proteja com pano limpo.", tema:"Primeiros Socorros"},
+    {q:"A faixa amarela contínua na via significa:", opts:["Pode ultrapassar","Proibição de ultrapassagem","Sentido único","Estacionamento"], correct:1, exp:"Linha amarela contínua = proibido ultrapassar ou transpor. Linha tracejada = permitido com segurança.", tema:"Sinalização"},
+    {q:"A linha branca tracejada no centro da via significa:", opts:["Proibido ultrapassar","Permite mudança de faixa com segurança","Sentido inverso","Faixa exclusiva"], correct:1, exp:"Tracejada permite cruzamento/mudança de faixa desde que seguro. Contínua = proibido.", tema:"Sinalização"},
+    {q:"Marcação de zebrado em V no asfalto indica:", opts:["Faixa de pedestre","Área neutra onde não se pode circular","Estacionamento","Faixa para bicicletas"], correct:1, exp:"Zebrado de canalização = área neutra. Direciona o fluxo e não pode ser invadida por veículos.", tema:"Sinalização"},
+    {q:"Veículo com farol queimado é infração:", opts:["Leve","Média","Grave","Gravíssima"], correct:1, exp:"Equipamento obrigatório defeituoso: infração média (Art. 230 XIV).", tema:"Mecânica"},
+    {q:"Causas de acidente classificadas como humanas incluem:", opts:["Chuva forte","Pista esburacada","Imprudência, imperícia e negligência","Veículo sem manutenção"], correct:2, exp:"Imprudência (agir sem cuidado), Imperícia (falta de habilidade), Negligência (omissão).", tema:"Direção Defensiva"},
+    {q:"Ao se aproximar de cruzamento sem sinalização, o condutor deve:", opts:["Acelerar para passar","Reduzir velocidade e ter cautela","Buzinar e continuar","Parar obrigatoriamente"], correct:1, exp:"Reduzir, observar e dar preferência a quem vier pela direita (regra geral, Art. 29 CTB).", tema:"Legislação"},
+    {q:"Conduzir veículo com CNH suspensa é infração:", opts:["Leve","Média","Grave","Gravíssima"], correct:3, exp:"Art. 162 II: gravíssima, multa x3, suspensão renovada e veículo retido.", tema:"Legislação"},
+    {q:"A luz indicadora de direção (seta) deve ser ligada:", opts:["Junto com a manobra","Antes de iniciar a manobra","Apenas em ultrapassagens","Quando solicitado"], correct:1, exp:"A seta deve ser acionada ANTES da manobra para alertar outros condutores.", tema:"Direção Defensiva"},
+    {q:"Pneus carecas (sem sulcos) afetam:", opts:["Apenas conforto","Frenagem e aderência, principalmente em piso molhado","Apenas consumo","Apenas estética"], correct:1, exp:"Sem sulcos não escoam água -> aquaplanagem. Reduz aderência, aumenta distância de frenagem.", tema:"Mecânica"},
+    {q:"O nível de água do limpador de para-brisa deve ser verificado:", opts:["Diariamente","Mensalmente","Quando a luz acender","Periodicamente"], correct:3, exp:"Verificação periódica - importante para visibilidade.", tema:"Mecânica"},
+    {q:"Em caso de incêndio no veículo, primeiro deve-se:", opts:["Abrir o capô","Desligar o motor e parar em local seguro","Acelerar","Manter motor ligado"], correct:1, exp:"Pare em local seguro, desligue ignição, saia do veículo, e só então acione bombeiros (193).", tema:"Primeiros Socorros"},
+    {q:"Crianças com menos de 10 anos devem viajar:", opts:["Em qualquer banco","No banco da frente","No banco traseiro com equipamento de retenção adequado","Sem cinto, se forem pequenas"], correct:2, exp:"Resolução CONTRAN: crianças até 10 anos no banco traseiro, com cadeirinha/assento/cinto adequado à idade.", tema:"Legislação"},
+    {q:"Recusar fazer bafômetro é infração:", opts:["Leve","Média","Grave","Gravíssima"], correct:3, exp:"Art. 165-A CTB: gravíssima, multa x10 (R$ 2.934,70), suspensão CNH por 12 meses.", tema:"Legislação"},
+    {q:"Sinalização vertical refere-se a:", opts:["Marcações no asfalto","Placas e painéis fixados nas vias","Faróis dos veículos","Gestos do agente de trânsito"], correct:1, exp:"Vertical: placas. Horizontal: pinturas no asfalto. Aérea: pórticos suspensos.", tema:"Sinalização"},
+    {q:"Em via com 2 faixas no mesmo sentido, o motorista deve circular:", opts:["Na faixa da esquerda","Na faixa da direita, usando a esquerda para ultrapassar","Em qualquer faixa","Sempre no centro"], correct:1, exp:"Princípio: dirija pela direita; a esquerda é para ultrapassagens.", tema:"Legislação"},
+    {q:"Em via urbana, parar o veículo em fila dupla é:", opts:["Permitido por 5 minutos","Infração leve","Infração média","Infração grave"], correct:3, exp:"Estacionar em fila dupla é infração grave (Art. 181 X), 5 pontos.", tema:"Legislação"},
+    {q:"O reservatório de fluido de freio deve estar:", opts:["Sempre cheio","Entre MIN e MAX","Sempre vazio","Não importa"], correct:1, exp:"Sempre entre MIN e MAX. Nível baixo pode indicar vazamento ou desgaste de pastilhas.", tema:"Mecânica"},
+    {q:"O retrovisor interno serve principalmente para:", opts:["Maquiagem","Visualizar passageiros traseiros","Ver o tráfego que vem atrás do veículo","Decoração"], correct:2, exp:"Visualizar o tráfego traseiro. Junto com os externos, elimina os pontos cegos.", tema:"Direção Defensiva"},
+    {q:"Manter o motor ligado em local fechado pode causar:", opts:["Economia de combustível","Intoxicação por monóxido de carbono","Acúmulo de óleo","Ferrugem"], correct:1, exp:"CO (monóxido de carbono) é inodoro e mortal. Nunca aqueça o motor em garagem fechada.", tema:"Primeiros Socorros"},
+    {q:"Reciclagem da CNH é obrigatória quando o condutor:", opts:["Faz aniversário","Atinge limite de pontos ou comete infração que exige curso","Compra um veículo novo","Muda de cidade"], correct:1, exp:"Curso obrigatório em casos de suspensão por pontuação, cassação ou infrações específicas (Art. 261/263).", tema:"Legislação"},
+    {q:"A distância de frenagem aumenta com:", opts:["Pneus novos","Velocidade alta e piso molhado","Freios calibrados","Boa iluminação"], correct:1, exp:"Quanto maior a velocidade e menor a aderência (chuva, óleo), maior a distância para parar.", tema:"Direção Defensiva"},
+    {q:"A poluição do ar nas cidades vem principalmente de:", opts:["Indústrias têxteis","Veículos automotores","Lixões","Construção civil"], correct:1, exp:"Nas grandes cidades, veículos respondem por 60-80% da poluição do ar.", tema:"Meio Ambiente"},
+    {q:"O alcoolismo afeta a direção porque:", opts:["Melhora reflexos","Reduz reflexos, atenção e julgamento","Aumenta visão noturna","Não tem efeito"], correct:1, exp:"Álcool é depressor do SNC: lentifica reflexos, distorce percepção de distância, dá falsa sensação de segurança.", tema:"Direção Defensiva"},
+    {q:"O cinto de 3 pontos é eficaz porque:", opts:["É confortável","Distribui forças do impacto pelo tórax e pelve","Aquece o ocupante","Reduz peso do carro"], correct:1, exp:"Distribui o impacto por áreas resistentes (clavícula, esterno, pelve) evitando esmagamento de órgãos.", tema:"Direção Defensiva"},
+    {q:"A travessia de ferrovias requer:", opts:["Aceleração para passar logo","Redução de velocidade e atenção dobrada","Buzinar","Frear bruscamente"], correct:1, exp:"Reduzir, parar se necessário e SEMPRE dar preferência ao trem.", tema:"Direção Defensiva"},
+    {q:"Em uma curva, o ideal é:", opts:["Frear no meio da curva","Reduzir antes, traçar e acelerar suavemente na saída","Acelerar entrando","Manter velocidade constante"], correct:1, exp:"Reduza ANTES, faça a curva em marcha estável e acelere progressivamente na saída.", tema:"Direção Defensiva"},
+    {q:"O CTB é a lei número:", opts:["Lei 8.069/90","Lei 9.503/97","Lei 10.406/02","Lei 13.105/15"], correct:1, exp:"Código de Trânsito Brasileiro: Lei nº 9.503, de 23 de setembro de 1997.", tema:"Legislação"},
+    {q:"O órgão máximo normativo do Sistema Nacional de Trânsito é o:", opts:["DETRAN","DENATRAN","CONTRAN","DNIT"], correct:2, exp:"CONTRAN: Conselho Nacional de Trânsito, normativo e consultivo.", tema:"Legislação"},
+    {q:"Em via pavimentada, o tempo de reação médio de um motorista atento é de cerca de:", opts:["0,1 segundo","0,75 segundo","2 segundos","5 segundos"], correct:1, exp:"Reação fisiológica média: 3/4 de segundo. Com cansaço/álcool/celular pode dobrar ou triplicar.", tema:"Direção Defensiva"},
+    {q:"Em estacionamento em aclive (subida) com meio-fio, as rodas devem:", opts:["Apontar para o meio-fio","Apontar para fora do meio-fio (rua)","Ficar retas","Não importa"], correct:1, exp:"Aclive COM meio-fio: rodas viradas para FORA. Sem meio-fio: para o meio-fio. Declive: sempre para o meio-fio.", tema:"Direção Defensiva"},
+    {q:"O lubrificante (óleo) do motor serve para:", opts:["Resfriar pneus","Reduzir atrito entre peças, refrigerar e limpar o motor","Aquecer o veículo","Aumentar potência"], correct:1, exp:"Reduz atrito, dissipa calor, limpa, veda e protege contra corrosão.", tema:"Mecânica"}
+  ],
+
+  dificil: [
+    {q:"Segundo o Art. 218 do CTB, transitar com velocidade superior à máxima em mais de 50% configura infração:", opts:["Grave, com multa x2","Gravíssima, com multa x3 e suspensão da CNH","Média, com advertência","Grave, sem suspensão"], correct:1, exp:"Art. 218 III: gravíssima multiplicada por 3 (R$ 880,41) + suspensão imediata + retenção do veículo.", tema:"Legislação"},
+    {q:"O limite mínimo de pontuação para suspensão da CNH com 2+ infrações gravíssimas em 12 meses é:", opts:["20 pontos","30 pontos","40 pontos","50 pontos"], correct:0, exp:"Lei 14.071/2020: 20 pts com 2+ gravíssimas; 30 pts com 1 gravíssima; 40 pts sem gravíssima (Art. 261).", tema:"Legislação"},
+    {q:"O Art. 304 do CTB tipifica como crime:", opts:["Excesso de velocidade","Deixar o condutor de prestar socorro à vítima de acidente","Estacionamento irregular","Falta de cinto"], correct:1, exp:"Omissão de socorro em acidente: detenção de 6 meses a 1 ano ou multa.", tema:"Legislação"},
+    {q:"O Art. 306 do CTB define como crime de embriaguez ao volante a concentração igual ou superior a:", opts:["0,3 mg/L de ar","0,5 mg/L de ar","0,3 mg/L de ar OU 6 dg/L de sangue","Qualquer concentração com sinais de embriaguez"], correct:2, exp:"Art. 306: crime quando há ≥ 6 dg/L de sangue OU ≥ 0,3 mg/L de ar alveolar. Detenção 6 meses-3 anos.", tema:"Legislação"},
+    {q:"Em via rural não pavimentada, a velocidade máxima padrão para automóveis é:", opts:["40 km/h","60 km/h","80 km/h","100 km/h"], correct:1, exp:"Estrada de terra (rural não pavimentada): 60 km/h, salvo sinalização.", tema:"Legislação"},
+    {q:"Disputar corrida (racha) é infração:", opts:["Grave","Gravíssima x3","Gravíssima x5","Gravíssima x10"], correct:3, exp:"Art. 173: gravíssima x10 (R$ 2.934,70) + suspensão + apreensão do veículo. Pode configurar crime (Art. 308).", tema:"Legislação"},
+    {q:"Para infrações médias, o Art. 267 do CTB prevê:", opts:["Apenas multa","Pode haver advertência por escrito se o condutor não tiver infrações nos últimos 12 meses","Suspensão automática","Cassação"], correct:1, exp:"Advertência por escrito em substituição à multa para leves/médias quando o condutor não tem outras nos últimos 12 meses.", tema:"Legislação"},
+    {q:"Na reanimação cardiopulmonar (RCP) de adulto, a frequência das compressões deve ser:", opts:["60 a 80 por minuto","100 a 120 por minuto","30 por minuto","Não há padrão"], correct:1, exp:"Diretrizes AHA: 100-120 compressões/min, profundidade 5-6 cm, no centro do tórax.", tema:"Primeiros Socorros"},
+    {q:"O 'ABC' do socorro em emergência é:", opts:["Andar, Buzinar, Cuidar","Airway (via aérea), Breathing (respiração), Circulation (circulação)","Acionar, Bater, Carregar","Avaliar, Bandagear, Chamar"], correct:1, exp:"A=via aérea (com controle cervical); B=respiração; C=circulação (e controle de hemorragias).", tema:"Primeiros Socorros"},
+    {q:"Em vítima com suspeita de fratura na coluna vertebral, o socorrista deve:", opts:["Levantá-la rapidamente","NÃO movê-la, salvo risco iminente, e aguardar resgate especializado","Sentá-la","Colocá-la em decúbito ventral"], correct:1, exp:"Movimentar pode causar lesão medular irreversível. Só remova em risco de morte (fogo/explosão).", tema:"Primeiros Socorros"},
+    {q:"Choque hipovolêmico em acidente é causado principalmente por:", opts:["Susto","Hemorragia intensa, perda de volume sanguíneo","Frio","Fome"], correct:1, exp:"Hemorragia grave -> queda da pressão -> hipoperfusão. Sinais: palidez, pulso fraco e rápido, sudorese fria.", tema:"Primeiros Socorros"},
+    {q:"A placa R-19 indica:", opts:["Parada obrigatória","Velocidade máxima permitida","Sentido proibido","Dê preferência"], correct:1, exp:"R-19: Velocidade Máxima Permitida (placa circular, fundo branco, número em preto e orla vermelha).", tema:"Sinalização"},
+    {q:"A placa A-14 sinaliza:", opts:["Curva acentuada","Semáforo à frente","Pedestres na via","Animais na pista"], correct:1, exp:"A-14: Sinalização Semafórica à Frente (placa de advertência, amarela com pictograma das 3 cores).", tema:"Sinalização"},
+    {q:"O Art. 311 do CTB tipifica como crime:", opts:["Falta de capacete","Trafegar em velocidade incompatível com a segurança em áreas escolares, hospitalares etc.","Estacionar em fila dupla","Buzinar à noite"], correct:1, exp:"Velocidade incompatível em vias com escolas, hospitais, área residencial: detenção 6 meses-1 ano + multa.", tema:"Legislação"},
+    {q:"O CONTRAN tem como função principal:", opts:["Aplicar multas","Estabelecer normas regulamentares e diretrizes da Política Nacional de Trânsito","Emitir CNH","Construir rodovias"], correct:1, exp:"CONTRAN: órgão normativo, consultivo e coordenador do SNT. Edita Resoluções aplicáveis em todo o país.", tema:"Legislação"},
+    {q:"Em pista com 3 ou mais faixas no mesmo sentido, ônibus e caminhões devem trafegar:", opts:["Na faixa mais à esquerda","Pelas faixas da direita, exceto ultrapassagem","No centro","Em qualquer faixa"], correct:1, exp:"Veículos lentos/pesados pela direita; centrais para velocidades intermediárias; esquerda só para ultrapassagem.", tema:"Legislação"},
+    {q:"Crime de homicídio culposo no trânsito (Art. 302) tem pena base de:", opts:["1 a 3 anos de detenção","2 a 4 anos de detenção","5 a 8 anos de reclusão","Apenas multa"], correct:2, exp:"Reclusão de 5 a 8 anos + suspensão/proibição de obter CNH. Aumentada se sob efeito de álcool/drogas.", tema:"Legislação"},
+    {q:"A 'visão periférica' do condutor refere-se a:", opts:["Visão frontal","Capacidade de perceber o ambiente lateral sem desviar o olhar central","Visão noturna","Visão de retrovisores"], correct:1, exp:"Permite captar movimentos laterais (pedestres, ciclistas, outros veículos) - essencial para direção defensiva.", tema:"Direção Defensiva"},
+    {q:"Aquaplanagem ocorre quando:", opts:["O motor pega água","Os pneus perdem contato com o solo devido a uma lâmina d'água","O para-brisa embaça","O sistema elétrico falha"], correct:1, exp:"Lâmina d'água entre pneu e asfalto faz o veículo 'flutuar', perdendo direção e frenagem.", tema:"Direção Defensiva"},
+    {q:"Em caso de aquaplanagem, o condutor deve:", opts:["Frear bruscamente","Tirar pé do acelerador e segurar o volante firme sem movimentos bruscos","Acelerar para sair","Virar o volante rapidamente"], correct:1, exp:"NÃO freie nem vire bruscamente. Tire o pé do acelerador, segure o volante reto e aguarde aderência.", tema:"Direção Defensiva"},
+    {q:"A medida administrativa de 'recolhimento da CNH' aplica-se quando:", opts:["Há excesso de pontos","O condutor está com a habilitação suspensa ou cassada","Há multa em aberto","O veículo está sem licenciamento"], correct:1, exp:"Recolhimento em casos como suspensão/cassação, alcoolemia (Art. 165) etc. Diferente de cassação.", tema:"Legislação"},
+    {q:"O índice de Octanagem (gasolina) refere-se a:", opts:["Cor do combustível","Resistência à detonação (autoignição) no motor","Volatilidade","Densidade"], correct:1, exp:"Octanagem mais alta -> maior resistência à detonação -> menos 'batida de pino' em motores de alta compressão.", tema:"Mecânica"},
+    {q:"Em rodovia, a faixa contínua amarela dupla significa:", opts:["Permite ultrapassagem com cuidado","Proíbe ultrapassagem em AMBOS os sentidos","Permite só de um lado","Apenas decorativa"], correct:1, exp:"Linha amarela dupla contínua = proibição total de ultrapassar/transpor em ambos os sentidos.", tema:"Sinalização"},
+    {q:"O 'ponto cego' no veículo é:", opts:["Local mal iluminado","Área não visível pelos retrovisores","Ponto de partida","Ponto de chegada"], correct:1, exp:"Área lateral-traseira não coberta pelos retrovisores. Eliminar: regular espelhos + giro de cabeça.", tema:"Direção Defensiva"},
+    {q:"Em parada cardiorrespiratória, o tempo crítico para iniciar RCP sem sequelas é:", opts:["1 minuto","Até 4-5 minutos","30 minutos","1 hora"], correct:1, exp:"Após 4-5 min sem oxigenação, lesão cerebral irreversível começa. RCP imediata salva vidas.", tema:"Primeiros Socorros"},
+    {q:"O Art. 277 do CTB trata de:", opts:["Estacionamento","Submissão a teste, exame clínico, perícia ou outro procedimento para verificar alcoolemia","Sinalização","Equipamentos obrigatórios"], correct:1, exp:"Art. 277: autoridade pode submeter condutor a teste (bafômetro) ou exame clínico. Recusar = penalidade do Art. 165.", tema:"Legislação"},
+    {q:"Carteira de Habilitação categoria 'E' permite conduzir:", opts:["Motos","Combinações de veículos (unidade acoplada) com PBT acima de 6.000 kg","Caminhões simples","Ônibus simples"], correct:1, exp:"E: combinações de veículos. Antes precisa ter C, D ou habilitação por 1+ ano em B.", tema:"Legislação"},
+    {q:"Em vítima com queimadura por curto-circuito elétrico, primeiro deve-se:", opts:["Tocar a vítima","Cortar a fonte de energia antes de socorrer","Jogar água imediatamente","Removê-la rapidamente"], correct:1, exp:"NUNCA toque vítima de choque elétrico antes de cortar a energia - você também levará choque.", tema:"Primeiros Socorros"},
+    {q:"O Art. 230 do CTB trata de:", opts:["Velocidade máxima","Infrações relacionadas a condições do veículo (equipamentos, conservação)","Direção sob efeito de álcool","Documentos do condutor"], correct:1, exp:"Art. 230: penalidades para equipamentos obrigatórios defeituosos, lacre adulterado, sem licenciamento etc.", tema:"Legislação"},
+    {q:"O fator de risco mais comum em colisão frontal é:", opts:["Sono","Imprudência em ultrapassagens","Pneus carecas","Falta de luz"], correct:1, exp:"Ultrapassagens em locais proibidos/sem visibilidade são responsáveis pela maioria das colisões frontais.", tema:"Direção Defensiva"},
+    {q:"Em motociclistas, o equipamento obrigatório inclui:", opts:["Apenas capacete","Capacete com viseira ou óculos de proteção, roupas com material retrorrefletivo","Apenas luvas","Apenas botas"], correct:1, exp:"Resolução CONTRAN: capacete homologado (condutor e passageiro), viseira/óculos, vestuário retrorrefletivo.", tema:"Legislação"},
+    {q:"Em caso de desmaio simples, deve-se:", opts:["Dar tapas","Deitar a vítima, elevar as pernas e arejar o ambiente","Dar água imediatamente","Sacudir"], correct:1, exp:"Deitar de costas, elevar as pernas (~30cm), afrouxar roupas, arejar. Se demorar >2min, chame socorro.", tema:"Primeiros Socorros"},
+    {q:"As vias urbanas são classificadas como:", opts:["Rurais e urbanas","Rodovias e estradas","Trânsito rápido, arteriais, coletoras e locais","Apenas principais e secundárias"], correct:2, exp:"Art. 60: vias urbanas = trânsito rápido (80), arteriais (60), coletoras (40), locais (30 km/h).", tema:"Legislação"},
+    {q:"A penalidade do Art. 165 (álcool) inclui:", opts:["Apenas multa","Multa x10 + suspensão por 12 meses + retenção do veículo","Apenas advertência","Cassação imediata"], correct:1, exp:"Multa x10 (R$ 2.934,70) + suspensão da CNH por 12 meses + retenção do veículo + recolhimento da CNH.", tema:"Legislação"},
+    {q:"Para evitar fadiga em viagens longas, recomenda-se:", opts:["Tomar café e seguir","Parar a cada 2 horas, descansar e se hidratar","Acelerar para chegar logo","Manter janelas fechadas"], correct:1, exp:"Pausa a cada 2h, hidratação, evitar refeições pesadas, dormir bem antes. Sono ao volante triplica risco de acidente fatal.", tema:"Direção Defensiva"},
+    {q:"Pulso normal de adulto em repouso é:", opts:["20 a 40 bpm","60 a 100 bpm","150 a 180 bpm","200 a 220 bpm"], correct:1, exp:"60-100 batimentos por minuto. Pulso fraco/rápido pode indicar choque; lento demais, problemas cardíacos.", tema:"Primeiros Socorros"},
+    {q:"A respiração normal de adulto é de:", opts:["5 a 10 mov/min","12 a 20 movimentos respiratórios por minuto","30 a 40 mov/min","Não há padrão"], correct:1, exp:"Adulto: 12-20 mrpm. Acima de 30 ou abaixo de 10 indica dificuldade respiratória - acione socorro.", tema:"Primeiros Socorros"},
+    {q:"Em via com sinalização indicando 'PROIBIDO ULTRAPASSAR' (R-7), o condutor que ultrapassar comete infração:", opts:["Leve","Média","Grave","Gravíssima"], correct:3, exp:"Art. 203 CTB: ultrapassar em local proibido = gravíssima, 7 pontos, multa R$ 293,47.", tema:"Legislação"},
+    {q:"Em moto, o uso de capacete pelo passageiro:", opts:["É opcional","É obrigatório, mesmo em trajetos curtos","Só após 18 anos","Só em rodovia"], correct:1, exp:"Capacete homologado é obrigatório para condutor E passageiro, em qualquer trajeto. Não usar = gravíssima.", tema:"Legislação"},
+    {q:"A 'Permissão para Dirigir' (PPD) tem validade de:", opts:["6 meses","1 ano","2 anos","5 anos"], correct:1, exp:"PPD vale por 1 ano. Sem infração grave/gravíssima nem reincidência em média, recebe a CNH definitiva.", tema:"Legislação"},
+    {q:"A regra dos 2 segundos é usada para calcular:", opts:["Tempo de reação","Distância de seguimento entre veículos","Tempo de parada total","Velocidade média"], correct:1, exp:"Ao passar do ponto fixo o veículo da frente, conte 2 segundos. Se você passar antes, está muito próximo.", tema:"Direção Defensiva"}
+  ]
+};
+
+/* ============================================
+   APP LOGIC
+   ============================================ */
+const STATE = {
+  level:null,
+  questions:[],
+  current:0,
+  answers:[], // {chosen, correct, qIndex}
+  score:0
+};
+
+const STORAGE_KEY = 'detran_mg_hist_v1';
+
+function navTo(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  var target = document.getElementById('view-'+view);
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.tabbar button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.nav===view);
+  });
+  if(view==='progresso') renderProgress();
+  if(view==='simulado') showSimuladoHome();
+  try { window.scrollTo(0, 0); } catch(e){}
+}
+
+// Inicialização — só depois do DOM montado (evita falhas no Safari iOS)
+function initApp(){
+  try {
+    // Tabbar (event delegation — funciona até em file:// no iOS)
+    document.querySelectorAll('.tabbar button[data-nav]').forEach(function(btn){
+      btn.addEventListener('click', function(){ navTo(btn.dataset.nav); });
+    });
+
+    // Cards de nível do simulado
+    document.querySelectorAll('.level[data-level]').forEach(function(btn){
+      btn.addEventListener('click', function(){ startQuiz(btn.dataset.level); });
+    });
+
+    // Accordion topics
+    document.querySelectorAll('[data-topic] .topic-head').forEach(function(h){
+      h.addEventListener('click', function(){
+        h.parentElement.classList.toggle('open');
+      });
+    });
+    // Abrir o primeiro tópico por padrão
+    var firstTopic = document.querySelector('[data-topic]');
+    if(firstTopic) firstTopic.classList.add('open');
+
+    renderProgress();
+  } catch(err) {
+    console.error('Erro init:', err);
+    alert('Erro ao inicializar: ' + err.message);
+  }
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+/* ===== SHUFFLE & SAMPLE ===== */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function sampleQuestions(level, n=10){
+  const pool = BANCO[level];
+  const idx = shuffle(pool.map((_,i)=>i)).slice(0,n);
+  return idx.map(i=>{
+    const q = pool[i];
+    // Embaralha as alternativas, mantendo controle do índice correto
+    const optsWithIdx = q.opts.map((opt,k)=>({opt, isCorrect:k===q.correct}));
+    const shuffled = shuffle(optsWithIdx);
+    const newCorrect = shuffled.findIndex(o=>o.isCorrect);
+    return {
+      q: q.q,
+      opts: shuffled.map(o=>o.opt),
+      correct: newCorrect,
+      exp: q.exp,
+      tema: q.tema
+    };
+  });
+}
+
+/* ===== QUIZ FLOW ===== */
+function showSimuladoHome(){
+  document.getElementById('simulado-home').style.display='block';
+  document.getElementById('quiz-area').style.display='none';
+  document.getElementById('result-area').style.display='none';
+}
+
+function startQuiz(level){
+  STATE.level = level;
+  STATE.questions = sampleQuestions(level, 10);
+  STATE.current = 0;
+  STATE.answers = [];
+  STATE.score = 0;
+  document.getElementById('simulado-home').style.display='none';
+  document.getElementById('result-area').style.display='none';
+  document.getElementById('quiz-area').style.display='block';
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = STATE.questions[STATE.current];
+  const total = STATE.questions.length;
+  const pct = ((STATE.current)/total)*100;
+  const levelLabel = {facil:'🟢 Fácil', medio:'🟡 Médio', dificil:'🔴 Difícil'}[STATE.level];
+
+  const html = `
+    <div class="quiz-header">
+      <div class="quiz-progress">
+        <span>${levelLabel}</span>
+        <span><b>${STATE.current+1}</b>/${total}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+
+    <div class="question-card">
+      <span class="tema-tag">${q.tema}</span>
+      <p class="question-text">${q.q}</p>
+      <div class="options" id="opts">
+        ${q.opts.map((opt,i)=>`
+          <button class="opt" data-i="${i}">
+            <span class="opt-letter">${String.fromCharCode(65+i)}</span>
+            <span>${opt}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div id="explanation" class="explanation">
+        <b>💡 Explicação</b>
+        <span>${q.exp}</span>
+      </div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn" id="btn-next" disabled>${STATE.current === total-1 ? 'Ver resultado' : 'Próxima'}</button>
+      <button class="btn ghost" onclick="abortQuiz()">Sair do simulado</button>
+    </div>
+  `;
+  document.getElementById('quiz-area').innerHTML = html;
+  document.querySelectorAll('#opts .opt').forEach(b=>{
+    b.addEventListener('click', ()=>selectOpt(parseInt(b.dataset.i)));
+  });
+  document.getElementById('btn-next').addEventListener('click', nextQuestion);
+  try { window.scrollTo(0, 0); } catch(e){}
+}
+
+function selectOpt(i){
+  const q = STATE.questions[STATE.current];
+  const opts = document.querySelectorAll('#opts .opt');
+  if(opts[0].disabled) return; // já respondida
+
+  opts.forEach((b,k)=>{
+    b.disabled = true;
+    if(k===q.correct) b.classList.add('correct');
+    if(k===i && k!==q.correct) b.classList.add('wrong');
+  });
+
+  const isOk = i===q.correct;
+  if(isOk) STATE.score++;
+  STATE.answers.push({chosen:i, correctIdx:q.correct, ok:isOk, tema:q.tema});
+
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQuestion(){
+  if(STATE.current < STATE.questions.length-1){
+    STATE.current++;
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function abortQuiz(){
+  if(confirm('Sair do simulado? O progresso será perdido.')){
+    showSimuladoHome();
+  }
+}
+
+function finishQuiz(){
+  const total = STATE.questions.length;
+  const score = STATE.score;
+  const pct = Math.round((score/total)*100);
+  // Aprovado = 70% (igual à prova real, 21/30)
+  const passed = pct >= 70;
+  const levelLabel = {facil:'🟢 Fácil', medio:'🟡 Médio', dificil:'🔴 Difícil'}[STATE.level];
+
+  // Salvar histórico
+  saveHist({
+    date: Date.now(),
+    level: STATE.level,
+    score: score,
+    total: total,
+    pct: pct,
+    passed: passed
+  });
+
+  // Stats por tema
+  const temaStats = {};
+  STATE.answers.forEach(a=>{
+    if(!temaStats[a.tema]) temaStats[a.tema] = {ok:0, total:0};
+    temaStats[a.tema].total++;
+    if(a.ok) temaStats[a.tema].ok++;
+  });
+
+  let html = `
+    <div class="result-card">
+      <div class="result-emoji">${passed?'🎉':'💪'}</div>
+      <div class="result-score ${passed?'ok':'fail'}">${score}/${total}</div>
+      <div class="result-msg">
+        ${passed
+          ? `Parabéns! Você atingiu <b>${pct}%</b> — acima do mínimo da prova.`
+          : `Você acertou <b>${pct}%</b>. Precisa de 70% (21/30) para passar — continue estudando!`}
+      </div>
+      <div class="result-meta">
+        <span class="meta-chip">Nível: <b>${levelLabel}</b></span>
+        <span class="meta-chip">Acertos por tema:</span>
+      </div>
+      <div class="result-meta" style="margin-top:8px">
+        ${Object.entries(temaStats).map(([t,s])=>`
+          <span class="meta-chip">${t}: <b>${s.ok}/${s.total}</b></span>
+        `).join('')}
+      </div>
+    </div>
+
+    <h4 style="margin:18px 0 10px;font-size:14px;color:var(--accent)">Revisão das questões</h4>
+    ${STATE.answers.map((a,i)=>{
+      const q = STATE.questions[i];
+      return `
+        <div class="review-q ${a.ok?'ok':'bad'}">
+          <b>${i+1}. ${q.q}</b>
+          ${a.ok
+            ? `<span>✅ Você acertou: ${q.opts[a.chosen]}</span>`
+            : `<span>❌ Sua resposta: ${q.opts[a.chosen]}<br>✅ Correta: ${q.opts[a.correctIdx]}</span>`
+          }
+        </div>
+      `;
+    }).join('')}
+
+    <div class="quiz-actions" style="margin-top:16px">
+      <button class="btn" onclick="startQuiz('${STATE.level}')">🔄 Novo simulado (${levelLabel})</button>
+      <button class="btn ghost" onclick="showSimuladoHome()">Escolher outro nível</button>
+    </div>
+  `;
+  document.getElementById('quiz-area').style.display='none';
+  document.getElementById('result-area').style.display='block';
+  document.getElementById('result-area').innerHTML = html;
+  try { window.scrollTo(0, 0); } catch(e){}
+}
+
+/* ===== STORAGE / HISTÓRICO ===== */
+function getHist(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e){ return []; }
+}
+
+function saveHist(entry){
+  const hist = getHist();
+  hist.unshift(entry);
+  if(hist.length>50) hist.length=50;
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(hist)); }
+  catch(e){}
+}
+
+function renderProgress(){
+  const hist = getHist();
+  const total = hist.length;
+  const ok = hist.filter(h=>h.passed).length;
+  const media = total ? Math.round(hist.reduce((s,h)=>s+h.pct,0)/total) : 0;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-aprovado').textContent = ok;
+  document.getElementById('stat-media').textContent = media+'%';
+
+  const list = document.getElementById('hist-list');
+  if(total===0){
+    list.innerHTML = `
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <p>Nenhum simulado realizado ainda.<br>Vá para a aba <b>Simulado</b> e comece!</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = hist.map(h=>{
+    const d = new Date(h.date);
+    const ds = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const levelLabel = {facil:'🟢 Fácil', medio:'🟡 Médio', dificil:'🔴 Difícil'}[h.level];
+    return `
+      <div class="hist-item">
+        <div class="hist-badge ${h.passed?'ok':'fail'}">${h.score}/${h.total}</div>
+        <div class="hist-info">
+          <h4>${levelLabel} · ${h.pct}%</h4>
+          <p>${ds} · ${h.passed?'Aprovado ✅':'Reprovado'}</p>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function resetHist(){
+  if(confirm('Apagar todo o histórico de simulados?')){
+    localStorage.removeItem(STORAGE_KEY);
+    renderProgress();
+  }
+}
+
+// (initApp já chama renderProgress na inicialização)
+</script>
+</body>
+</html>
